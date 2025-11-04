@@ -2,7 +2,7 @@
 :root {
 
   /*  CAMBIA SOLO ESTE VALOR PARA MODIFICAR EL COLOR EN TODA LA APLICACIÓN  */
-  --color-primary: #6500a9;
+  --color-primary: #39A900;
 
   --color-primary-dark: var(--color-primary);
   --color-primary-light: var(--color-primary);
