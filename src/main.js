@@ -7,14 +7,13 @@ import '@quasar/extras/material-symbols-outlined/material-symbols-outlined.css'
 import 'quasar/dist/quasar.css'
 import './styles/variables.css'
 import App from './App.vue'
-import  router  from './routers/routers.js'
+import router from './routers/routers.js'
 
 const myApp = createApp(App)
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
-myApp.use(router)
-
 myApp.use(pinia)
+myApp.use(router)
 myApp.use(Quasar, {
   plugins: {
     Notify,
