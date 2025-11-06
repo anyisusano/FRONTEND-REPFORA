@@ -1,5 +1,6 @@
-﻿import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import MainLayout from '../layouts/MainLayout.vue'
+import { useAuthStore } from '../stores/authStore'
 
 // Main views
 import Login from '../views/Login.vue'
@@ -69,66 +70,72 @@ import FamilyBusinessInternship from '../views/aprendiz/modalidadesEP/FamilyBusi
 import ProductiveProject from '../views/aprendiz/modalidadesEP/ProductiveProject.vue'
 import EmploymentContract from '../views/aprendiz/modalidadesEP/EmploymentContract.vue'
 
+const ADMIN_ROLES = ['ADMINISTRADOR', 'ETAPA PRODUCTIVA VIRTUAL', 'ETAPA PRODUCTIVA PRESENCIAL']
+const INSTRUCTOR_ROLES = ['INSTRUCTOR', 'INSTRUCTOR OWNER']
+const APPRENTICE_ROLES = ['APRENDIZ']
+
 const routes = [
-  { path: '/', component: Login },
-  { path: '/CambiarContrasena', name: 'ChangePassword', component: ChangePassword },
-  { path: '/IngresarCodigoContrasena', name: 'EnterPasswordCode', component: EnterPasswordCode },
-  { path: '/NuevaContrasena', name: 'NewPassword', component: NewPassword },
+  { path: '/', name: 'Login', component: Login, meta: { requiresGuest: true } },
+  { path: '/CambiarContrasena', name: 'ChangePassword', component: ChangePassword, meta: { requiresGuest: true } },
+  { path: '/IngresarCodigoContrasena', name: 'EnterPasswordCode', component: EnterPasswordCode, meta: { requiresGuest: true } },
+  { path: '/NuevaContrasena', name: 'NewPassword', component: NewPassword, meta: { requiresGuest: true } },
   {
     path: '/app',
     component: MainLayout,
+    meta: { requiresAuth: true },
+    redirect: { name: 'Home' },
     children: [
       { path: 'inicio', name: 'Home', component: Home },
-      { path: 'aprendiz/inicio', name: 'ApprenticeHome', component: ApprenticeHome },
-      { path: 'aprendiz/registros', name: 'ApprenticeRegistrations', component: ProductiveStageRegistration },
-      { path: 'aprendiz/bitacoras', name: 'Logbooks', component: Logbooks },
-      { path: 'aprendiz/datospersonales', name: 'PersonalData', component: PersonalData },
-      { path: 'aprendiz/misregistros', name: 'MyRegistrations', component: MyRegistrations },
-      { path: 'aprendiz/procesoep', name: 'ProductiveStageProcess', component: ProductiveStageProcess },
-      { path: 'aprendiz/registroep', name: 'ProductiveStageRegistration', component: ProductiveStageRegistration },
-      { path: 'aprendiz/modalidadesEP/contratodeaprendizaje', name: 'ApprenticeshipContract', component: ApprenticeshipContract },
-      { path: 'aprendiz/modalidadesEP/monitoriasena', name: 'SenaMonitoring', component: SenaMonitoring },
-      { path: 'aprendiz/modalidadesEP/pasantiaongentidad', name: 'NgoEntityInternship', component: NgoEntityInternship },
-      { path: 'aprendiz/modalidadesEP/pasantiapyme', name: 'SmeInternship', component: SmeInternship },
-      { path: 'aprendiz/modalidadesEP/pasantiaupfamiliar', name: 'FamilyBusinessInternship', component: FamilyBusinessInternship },
-      { path: 'aprendiz/modalidadesEP/proyectoproductivo', name: 'ProductiveProject', component: ProductiveProject },
-      { path: 'aprendiz/modalidadesEP/vinculolaboralcontractual', name: 'EmploymentContract', component: EmploymentContract },
-      { path: 'admin/empresas', name: 'Companies', component: Companies },
-      { path: 'admin/instructores', name: 'Instructors', component: Instructors },
-      { path: 'admin/aprendices/:ficheId?', name: 'Apprentices', component: Apprentices },
-      { path: 'admin/documentos', name: 'Documents', component: Documents },
-      { path: 'admin/fichas', name: 'Groups', component: Groups },
-      { path: 'admin/parametros', name: 'Parameters', component: Parameters },
-      { path: 'admin/reportes', name: 'Reports', component: Reports },
-      { path: 'admin/validarsolicitudes', name: 'ValidateRequests', component: ValidateRequests },
-      { path: 'admin/novedadesAdmin', name: 'AdminNews', component: AdminNews },
-      { path: 'admin/modalidadesEP', name: 'ProductiveStageModalities', component: ProductiveStageModalities },
-      { path: 'admin/registrosEP', name: 'ProductiveStageRegistrations', component: ProductiveStageRegistrations },
-      { path: 'admin/buscar-ficha', name: 'SearchGroup', component: SearchGroup },
-      { path: 'admin/documentos/:ficha', name: 'DocumentsView', component: DocumentsView },
-      { path: 'admin/documentos/:ficha/aprendiz/:aprendizId', name: 'ApprenticeDocumentsDetail', component: ApprenticeDocumentsDetail },
-      { path: 'admin/alertas', name: 'Alerts', component: Alerts },
-      { path: 'admin/almacenamiento', name: 'Storage', component: Storage },
-      { path: 'admin/correos', name: 'Emails', component: Emails },
-      { path: 'admin/horasintructores', name: 'InstructorHours', component: InstructorHours },
-      { path: 'admin/procesoformativo', name: 'TrainingProcess', component: TrainingProcess },
-      { path: 'admin/seguridad', name: 'Security', component: Security },
-      { path: 'admin/plantillas', name: 'Templates', component: Templates },
-      { path: 'admin/horasporinstructor', name: 'HoursByInstructor', component: HoursByInstructor },
-      { path: 'admin/reporteporaño', name: 'ReportByYear', component: ReportByYear },
-      { path: 'admin/reporteporempresa', name: 'ReportByCompany', component: ReportByCompany },
-      { path: 'admin/reportepormodalidad', name: 'ReportByModality', component: ReportByModality },
-      { path: 'admin/vistareporteporaño', name: 'ReportByYearView', component: ReportByYearView },
-      { path: 'admin/vistareporteporempresa', name: 'ReportByCompanyView', component: ReportByCompanyView },
-      { path: 'admin/vistareportepormodalidad', name: 'ReportByModalityView', component: ReportByModalityView },
-      { path: 'admin/vistareporteporinstructor', name: 'ReportByInstructorView', component: ReportByInstructorView },
-      { path: 'instructor/bitacoras', name: 'InstructorLogbooks', component: InstructorLogbooks },
-      { path: 'instructor/historial', name: 'InstructorHistory', component: InstructorHistory },
-      { path: 'instructor/informepersonal', name: 'PersonalReport', component: PersonalReport },
-      { path: 'instructor/misaprendices', name: 'MyApprentices', component: MyApprentices },
-      { path: 'instructor/novedades', name: 'InstructorNews', component: InstructorNews },
-      { path: 'instructor/seguimientos', name: 'Followups', component: Followups },
-      { path: 'instructor/vistahoras', name: 'HoursView', component: HoursView },
+      { path: 'aprendiz/inicio', name: 'ApprenticeHome', component: ApprenticeHome, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/registros', name: 'ApprenticeRegistrations', component: ProductiveStageRegistration, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/bitacoras', name: 'Logbooks', component: Logbooks, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/datospersonales', name: 'PersonalData', component: PersonalData, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/misregistros', name: 'MyRegistrations', component: MyRegistrations, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/procesoep', name: 'ProductiveStageProcess', component: ProductiveStageProcess, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/registroep', name: 'ProductiveStageRegistration', component: ProductiveStageRegistration, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/modalidadesEP/contratodeaprendizaje', name: 'ApprenticeshipContract', component: ApprenticeshipContract, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/modalidadesEP/monitoriasena', name: 'SenaMonitoring', component: SenaMonitoring, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/modalidadesEP/pasantiaongentidad', name: 'NgoEntityInternship', component: NgoEntityInternship, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/modalidadesEP/pasantiapyme', name: 'SmeInternship', component: SmeInternship, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/modalidadesEP/pasantiaupfamiliar', name: 'FamilyBusinessInternship', component: FamilyBusinessInternship, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/modalidadesEP/proyectoproductivo', name: 'ProductiveProject', component: ProductiveProject, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'aprendiz/modalidadesEP/vinculolaboralcontractual', name: 'EmploymentContract', component: EmploymentContract, meta: { roles: APPRENTICE_ROLES } },
+      { path: 'admin/empresas', name: 'Companies', component: Companies, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/instructores', name: 'Instructors', component: Instructors, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/aprendices/:ficheId?', name: 'Apprentices', component: Apprentices, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/documentos', name: 'Documents', component: Documents, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/fichas', name: 'Groups', component: Groups, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/parametros', name: 'Parameters', component: Parameters, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/reportes', name: 'Reports', component: Reports, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/validarsolicitudes', name: 'ValidateRequests', component: ValidateRequests, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/novedadesAdmin', name: 'AdminNews', component: AdminNews, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/modalidadesEP', name: 'ProductiveStageModalities', component: ProductiveStageModalities, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/registrosEP', name: 'ProductiveStageRegistrations', component: ProductiveStageRegistrations, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/buscar-ficha', name: 'SearchGroup', component: SearchGroup, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/documentos/:ficha', name: 'DocumentsView', component: DocumentsView, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/documentos/:ficha/aprendiz/:aprendizId', name: 'ApprenticeDocumentsDetail', component: ApprenticeDocumentsDetail, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/alertas', name: 'Alerts', component: Alerts, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/almacenamiento', name: 'Storage', component: Storage, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/correos', name: 'Emails', component: Emails, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/horasintructores', name: 'InstructorHours', component: InstructorHours, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/procesoformativo', name: 'TrainingProcess', component: TrainingProcess, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/seguridad', name: 'Security', component: Security, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/plantillas', name: 'Templates', component: Templates, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/horasporinstructor', name: 'HoursByInstructor', component: HoursByInstructor, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/reporteporaño', name: 'ReportByYear', component: ReportByYear, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/reporteporempresa', name: 'ReportByCompany', component: ReportByCompany, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/reportepormodalidad', name: 'ReportByModality', component: ReportByModality, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/vistareporteporaño', name: 'ReportByYearView', component: ReportByYearView, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/vistareporteporempresa', name: 'ReportByCompanyView', component: ReportByCompanyView, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/vistareportepormodalidad', name: 'ReportByModalityView', component: ReportByModalityView, meta: { roles: ADMIN_ROLES } },
+      { path: 'admin/vistareporteporinstructor', name: 'ReportByInstructorView', component: ReportByInstructorView, meta: { roles: ADMIN_ROLES } },
+      { path: 'instructor/bitacoras', name: 'InstructorLogbooks', component: InstructorLogbooks, meta: { roles: INSTRUCTOR_ROLES } },
+      { path: 'instructor/historial', name: 'InstructorHistory', component: InstructorHistory, meta: { roles: INSTRUCTOR_ROLES } },
+      { path: 'instructor/informepersonal', name: 'PersonalReport', component: PersonalReport, meta: { roles: INSTRUCTOR_ROLES } },
+      { path: 'instructor/misaprendices', name: 'MyApprentices', component: MyApprentices, meta: { roles: INSTRUCTOR_ROLES } },
+      { path: 'instructor/novedades', name: 'InstructorNews', component: InstructorNews, meta: { roles: INSTRUCTOR_ROLES } },
+      { path: 'instructor/seguimientos', name: 'Followups', component: Followups, meta: { roles: INSTRUCTOR_ROLES } },
+      { path: 'instructor/vistahoras', name: 'HoursView', component: HoursView, meta: { roles: INSTRUCTOR_ROLES } }
     ]
   }
 ]
@@ -137,5 +144,42 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+
+  const requiresAuth = to.matched.some((record) => record.meta?.requiresAuth)
+  const requiresGuest = to.matched.some((record) => record.meta?.requiresGuest)
+
+  if (requiresAuth && !authStore.isAuthenticated) {
+    return next({ path: '/', query: { redirect: to.fullPath } })
+  }
+
+  if (requiresGuest && authStore.isAuthenticated) {
+    return next(resolveDefaultRoute(authStore))
+  }
+
+  const requiredRoles = to.matched
+    .filter((record) => Array.isArray(record.meta?.roles) && record.meta.roles.length > 0)
+    .flatMap((record) => record.meta.roles)
+
+  if (requiredRoles.length > 0 && !authStore.hasRole(requiredRoles)) {
+    return next(resolveDefaultRoute(authStore))
+  }
+
+  return next()
+})
+
+function resolveDefaultRoute(authStore) {
+  if (!authStore?.isAuthenticated) {
+    return { path: '/' }
+  }
+
+  if (authStore.hasRole(APPRENTICE_ROLES)) {
+    return { path: '/app/aprendiz/inicio' }
+  }
+
+  return { path: '/app/inicio' }
+}
 
 export default router
