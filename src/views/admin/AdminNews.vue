@@ -26,25 +26,26 @@
     </div>
 
     <!-- Vista de Urgentes -->
-    <div v-if="!showTable" class="urgent-cards-container">
-      <div class="text-weight-bold text-center q-mb-md text-h6">Novedades Urgentes</div>
-      <div class="urgent-cards-grid">
-        <CardNovedades
-          v-for="news in urgentNews"
-          :key="news._id || news.id || Math.random()"
-          :novedades="[news]"
-          :loading="isLoading"
-          :error-message="errorMessage"
-          @clear-error="errorMessage = ''"
-        />
-      </div>
-      <div class="text-center q-mt-xl">
-        <BotonIngresar
-          label="Ver todas las novedades"
-          @click="showTable = true"
-        />
-      </div>
-    </div>
+   <!-- Vista de Urgentes -->
+<div v-if="!showTable" class="urgent-cards-container">
+  <div class="urgent-title">Novedades Urgentes</div>
+  <div class="urgent-cards-grid">
+    <CardNovedades
+      v-for="news in urgentNews"
+      :key="news._id || news.id || Math.random()"
+      :novedades="[news]"
+      :loading="isLoading"
+      :error-message="errorMessage"
+      @clear-error="errorMessage = ''"
+    />
+  </div>
+  <div class="text-center q-mt-xl">
+    <BotonIngresar
+      label="Ver todas las novedades"
+      @click="showTable = true"
+    />
+  </div>
+</div>
 
     <!-- Vista de Tabla -->
     <div v-else class="container">
@@ -78,16 +79,18 @@
         :initial-rows-per-page="10"
       >
         <template #body-cell-acciones="props">
-          <q-td :props="props">
+          <q-td :props="props" class="q-gutter-sm">
             <q-btn
               flat
               round
               color="primary"
               icon="visibility"
-              @click="handleViewDetails(props.row)"
+              @click="handleViewDetails(props.row._raw || props.row)"
             >
               <q-tooltip>Ver detalles</q-tooltip>
             </q-btn>
+
+            <!-- estado eliminado: solo mostrar botón ojo -->
           </q-td>
         </template>
       </maintable>
@@ -157,7 +160,14 @@
               <div class="data-row">
                 <div class="text-weight-bold">Instructor:</div>
                 <div class="data-value">
-                  <template v-if="selectedNews.instructor">
+                  <!-- Cambiado: mostrar fiche.owner.name > owner.name > instructor existente -->
+                  <template v-if="selectedNews.fiche?.owner?.name">
+                    {{ selectedNews.fiche.owner.name }}
+                  </template>
+                  <template v-else-if="selectedNews.owner?.name">
+                    {{ selectedNews.owner.name }}
+                  </template>
+                  <template v-else-if="selectedNews.instructor">
                     <template v-if="typeof selectedNews.instructor === 'object'">
                       {{ selectedNews.instructor.name || selectedNews.instructor.Name || selectedNews.instructor._id || '-' }}
                     </template>
@@ -198,7 +208,6 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { apiClient } from '../../services/apiClient'
 import { useNotifications } from '../../composables/useNotifications'
-// useTableFiltering está deprecado - el filtrado debe hacerse en el backend
 import { useApiData } from '../../composables/useApiData'
 import BackButton from '../../components/BackButton.vue'
 import BotonIngresar from '../../components/BotonIngresar.vue'
@@ -211,17 +220,7 @@ import StatsCard from '../../components/cards/StatsCard.vue'
 // Composables
 const notifications = useNotifications()
 
-// Usar composable para datos
-const { 
-  data: rawNews, 
-  isLoading, 
-  fetchData: fetchNews 
-} = useApiData('/news/listNews', {
-  showEmptyInfo: false,
-  errorMessage: 'Error al cargar novedades'
-})
-
-// Cargar instructores para mapear IDs a nombres
+// Usar composable para datos de instructores
 const { 
   data: rawInstructors, 
   fetchData: fetchInstructors 
@@ -258,28 +257,6 @@ function buildInstructorMap() {
 // Watch para actualizar el mapeo cuando cambien los instructores
 watch(rawInstructors, (newValue) => {
   buildInstructorMap()
-  if (instructorMap.value && Object.keys(instructorMap.value).length > 0) {
-    console.log('📚 Mapeo de instructores creado:', Object.keys(instructorMap.value).length, 'instructores')
-    // Mostrar algunos ejemplos de IDs en el mapeo para verificar formato
-    const allIds = Object.keys(instructorMap.value)
-    const sampleIds = []
-    let idx = 0
-    while (idx < allIds.length && idx < 3) {
-      sampleIds.push(allIds[idx])
-      idx++
-    }
-    console.log('📚 Ejemplo de IDs en mapeo:', sampleIds)
-    const sampleNames = []
-    idx = 0
-    while (idx < sampleIds.length) {
-      const id = sampleIds[idx]
-      if (instructorMap.value[id]) {
-        sampleNames.push(instructorMap.value[id])
-      }
-      idx++
-    }
-    console.log('📚 Ejemplo de nombres en mapeo:', sampleNames)
-  }
 }, { immediate: true, deep: true })
 
 // State
@@ -297,14 +274,33 @@ const selectedNews = ref(null)
 const searchTerm = ref('')
 const statusFilter = ref('all')
 
+// Agregado: refs locales para novedades e indicador de carga
+const rawNews = ref([])
+const isLoading = ref(false)
+
+// Función solicitada (copiada tal cual)
+async function fetchNews() {
+  try {
+    const response = await apiClient.get('/news/listNews')
+    if (!response.data?.msg) {
+      throw new Error('No hay datos disponibles')
+    }
+    return response.data.msg
+  } catch (error) {
+    const errorMsg = error.response?.data?.msg || error.message || 'Error al cargar novedades'
+    errorMessage.value = errorMsg
+    notifications.error(errorMsg)
+    throw error
+  }
+}
+
 // Los datos vienen crudos del backend sin transformaciones
 const newsItems = rawNews
 
 // Debug: Verificar qué datos se están recibiendo
 watch(rawNews, (newValue) => {
   if (Array.isArray(newValue) && newValue.length > 0) {
-    console.log('📰 Primer elemento completo:', JSON.stringify(newValue[0], null, 2))
-    console.log('📰 Propiedades del primer elemento:', Object.keys(newValue[0]))
+    // Eliminados logs de depuración
   }
 }, { immediate: true, deep: true })
 
@@ -312,7 +308,43 @@ watch(rawNews, (newValue) => {
 const detailsModalRef = ref(null)
 
 // Los datos ya vienen filtrados del backend
-const filteredItems = newsItems
+const filteredItems = computed(() => {
+  if (!Array.isArray(newsItems.value)) return []
+  const mapped = []
+  let idx = 0
+  while (idx < newsItems.value.length) {
+    const news = newsItems.value[idx]
+    if (!news) { idx++; continue }
+    const programaValor = news?.fiche?.program?.name || news?.fiche?.program?.code || news?.coordination?.name || '-'
+    const fechaVal = news?.createdAt ? new Date(news.createdAt).toLocaleDateString('es-ES', {
+      day: '2-digit', month: '2-digit', year: 'numeric'
+    }) : (news?.date ? new Date(news.date).toLocaleDateString('es-ES', {
+      day: '2-digit', month: '2-digit', year: 'numeric'
+    }) : '-')
+
+    mapped.push({
+      id: news._id,
+      fecha: fechaVal,
+      aprendiz: news.name || '-',
+      documento: ((news.tpdocument || '') + ' ' + (news.document || '')).trim() || '-',
+      ficha: news.fiche?.number || '-',
+      programa: programaValor,
+      tipo: news.tpnew || '-',
+      gravedad: news.status === 0 ? 'Alta' : 'Baja',
+      estado: news.state ?? (news.status !== undefined ? String(news.status) : '-'),
+      // Cambiado: priorizar fiche.owner.name, luego owner.name, luego nameInstructor, luego mapeo por id
+      instructor: news.fiche?.owner?.name || news.owner?.name || news.nameInstructor || instructorMap.value[String(news.instructor)] || 'Pendiente',
+      prioridad: news.processed ? 'normal' : 'urgente',
+      descripcion: news.cause || news.description || news.descripcion || '-',
+      respuestas: news.answers || news.respuestas || [],
+      imagenes: news.img || news.images || null,
+      // conservar original para modal
+      _raw: news
+    })
+    idx++
+  }
+  return mapped
+})
 
 // Computed urgent news - sin usar filter
 const urgentNews = computed(() => {
@@ -369,88 +401,16 @@ const urgentNews = computed(() => {
   return result
 })
 
-// Table Columns - Basado en la estructura real del backend
-// Los datos tienen: name, document, fiche.number, fiche.program.name, tpnew, state, instructor (ID), createdAt
+// Table Columns - usar las propiedades planas del mapping
 const columns = [
-  { 
-    name: 'fecha', 
-    align: 'left', 
-    label: 'Fecha', 
-    field: row => {
-      const value = row?.createdAt || row?.datesofia || row?.date || row?.fecha || ''
-      if (!value) return '-'
-      try {
-        return new Date(value).toLocaleDateString('es-ES')
-      } catch (e) {
-        return value
-      }
-    }, 
-    sortable: true 
-  },
-  { 
-    name: 'aprendiz', 
-    align: 'left', 
-    label: 'Aprendiz', 
-    field: row => {
-      // El backend usa 'name' directamente
-      return row?.name || '-'
-    }
-  },
-  { 
-    name: 'cedula', 
-    align: 'left', 
-    label: 'Cédula', 
-    field: row => {
-      // El backend usa 'document' y 'tpdocument'
-      const docType = row?.tpdocument || ''
-      const docNumber = row?.document || ''
-      return docNumber ? `${docType} ${docNumber}`.trim() : '-'
-    }
-  },
-  { 
-    name: 'ficha', 
-    align: 'left', 
-    label: 'Ficha', 
-    field: row => {
-      // El backend tiene fiche como objeto con number
-      const fiche = row?.fiche
-      if (fiche && typeof fiche === 'object' && fiche.number) {
-        return fiche.number
-      }
-      return row?.code || '-'
-    }
-  },
-  { 
-    name: 'programa', 
-    align: 'left', 
-    label: 'Programa', 
-    field: row => {
-      // El backend tiene fiche.program.name
-      const program = row?.fiche?.program
-      if (program && typeof program === 'object') {
-        return program.name || program.code || '-'
-      }
-      return row?.coordination?.name || '-'
-    }
-  },
-  { 
-    name: 'tipo', 
-    align: 'left', 
-    label: 'Tipo', 
-    field: row => {
-      // El backend usa 'tpnew'
-      return row?.tpnew || '-'
-    }
-  },
-  { 
-    name: 'estado', 
-    align: 'center', 
-    label: 'Estado', 
-    field: row => {
-      // El backend usa 'state' (string) y 'status' (número)
-      return row?.state || (row?.status !== undefined ? String(row.status) : '-')
-    }
-  },
+  { name: 'fecha', align: 'left', label: 'Fecha', field: row => row?.fecha || '-', sortable: true },
+  { name: 'aprendiz', align: 'left', label: 'Aprendiz', field: row => row?.aprendiz || '-' },
+  { name: 'documento', align: 'left', label: 'Cédula', field: row => row?.documento || '-' },
+  { name: 'ficha', align: 'left', label: 'Ficha', field: row => row?.ficha || '-' },
+  { name: 'programa', align: 'left', label: 'Programa', field: row => row?.programa || '-' },
+  { name: 'tipo', align: 'left', label: 'Tipo', field: row => row?.tipo || '-' },
+  { name: 'gravedad', align: 'center', label: 'Gravedad', field: row => row?.gravedad || '-' },
+  { name: 'estado', align: 'center', label: 'Estado', field: row => row?.estado || '-' },
   { 
     name: 'instructor', 
     align: 'left', 
@@ -469,33 +429,12 @@ const columns = [
       const instructorId = String(instructor)
       const instructorName = instructorMap.value[instructorId]
       
-      // Debug: solo loguear si no se encuentra (para no saturar la consola)
-      if (!instructorName && instructorMap.value && Object.keys(instructorMap.value).length > 0) {
-        // Solo loguear una vez por ID faltante
-        if (!window._loggedMissingInstructors) {
-          window._loggedMissingInstructors = new Set()
-        }
-        if (!window._loggedMissingInstructors.has(instructorId)) {
-          console.warn('⚠️ Instructor ID no encontrado en mapeo:', instructorId)
-          console.warn('📚 IDs disponibles en mapeo (primeros 5):', Object.keys(instructorMap.value).slice(0, 5))
-          window._loggedMissingInstructors.add(instructorId)
-        }
-      }
-      
-      // Si no se encuentra en el mapeo, puede ser que los instructores aún no se hayan cargado
-      // Retornar el ID temporalmente hasta que se cargue el mapeo
+      // Eliminados logs/advertencias para no imprimir en consola
+      // Si no se encuentra en el mapeo, retornar el ID temporalmente
       return instructorName || instructorId
     }
   },
-  { 
-    name: 'tiempo', 
-    align: 'center', 
-    label: 'Tiempo', 
-    field: row => {
-      const dateValue = row?.createdAt || row?.datesofia || ''
-      return dateValue ? getElapsedTime(dateValue) : '-'
-    }
-  },
+  { name: 'prioridad', align: 'center', label: 'Prioridad', field: row => row?.prioridad || '-' },
   { name: 'acciones', align: 'center', label: 'Acciones', field: 'acciones' }
 ]
 
@@ -590,13 +529,13 @@ function updateStats(newsArray) {
 // DEPRECADO: El backend debe devolver los datos en el formato correcto
 function processNewsForTable(newsArray) {
   // Esta función está deprecada - el backend debe devolver los datos listos
-  console.warn('processNewsForTable está deprecado. El backend debe devolver los datos en el formato correcto.')
   newsItems.value = newsArray
 }
 
 // Event Handlers
 function handleViewDetails(news) {
-  selectedNews.value = news
+  // news puede ser el objeto mapeado o la novedad cruda; preferir la cruda si viene
+  selectedNews.value = news?._raw ? news._raw : news
   detailsModalRef.value?.openDialog()
 }
 
@@ -608,11 +547,21 @@ watch(newsItems, (newValue) => {
 }, { immediate: true })
 
 // Lifecycle
-onMounted(() => {
-  fetchNews()
+onMounted(async () => {
+  isLoading.value = true
+  try {
+    const data = await fetchNews()
+    rawNews.value = Array.isArray(data) ? data : []
+  } catch (e) {
+    // error manejado dentro de fetchNews
+    rawNews.value = []
+  } finally {
+    isLoading.value = false
+  }
   fetchInstructors()
 })
 </script>
+Styles Adminnews
 
 <style lang="sass" scoped>
 .container
@@ -643,21 +592,32 @@ onMounted(() => {
 .stat-card:hover
   transform: translateY(-5px)
 
+.urgent-title
+  font-size: 2.0rem
+  font-weight: 700
+  text-align: center
+  margin-bottom: 32px
+  color: black
+  letter-spacing: 1px
+  text-transform: uppercase
+
 .urgent-cards-grid
   display: grid
   grid-template-columns: repeat(4, 1fr)
   grid-auto-flow: row
-  gap: 24px
+  gap: 28px
   width: 100%
-  padding: 10px 0
+  padding: 20px 0
 
-.urgent-cards-container
-  margin-top: 48px
-  padding: 32px 24px
-  background-color: #fff3e0
-  border-radius: 12px
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1)
-  width: 100%
+
+.urgent-cards-container 
+  margin-top: 48px;
+  padding: 32px 24px;
+  background-color: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+
 
 .section-title
   color: var(--color-primary)
@@ -689,6 +649,7 @@ onMounted(() => {
 .data-value
   color: #34495e
   font-size: 0.95rem
+
 
 @media (max-width: 900px)
   .urgent-cards-grid

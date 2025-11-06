@@ -22,7 +22,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import StatsCard from 'src/components/cards/StatsCard.vue'
 import MainTable from 'src/components/tables/MainTable.vue'
-import axios from 'axios'
+import { getData } from '../../../services/apiClient'
 import BackButton from 'src/components/BackButton.vue'
 
 // Capturar parámetros del filtro enviados por el componente anterior
@@ -57,9 +57,13 @@ const datos = ref([])
 //Cargar datos desde backend usando los filtros
 const obtenerDatos = async () => {
   try {
-    const response = await axios.get('/api/reportes/empresa', {
-      params: filtros.value
-    })
+    const params = new URLSearchParams()
+    if (filtros.value.empresa) params.append('empresa', filtros.value.empresa)
+    if (filtros.value.tipoContrato) params.append('tipoContrato', filtros.value.tipoContrato)
+    if (filtros.value.estadoContrato) params.append('estadoContrato', filtros.value.estadoContrato)
+    if (filtros.value.anio) params.append('anio', filtros.value.anio)
+    const url = `/reportes/empresa${params.toString() ? `?${params.toString()}` : ''}`
+    const response = await getData(url)
 
     // Backend devuelve algo como:
     // {
@@ -67,13 +71,13 @@ const obtenerDatos = async () => {
     //   resumen: { totalAprendices: 45, activos: 30, finalizados: 10 }
     // }
 
-    datos.value = response.data.aprendices || []
+    datos.value = response.aprendices || []
 
     // Actualizar cards
-    if (response.data.resumen) {
-      cards.value[0].value = response.data.resumen.totalAprendices || 0
-      cards.value[1].value = response.data.resumen.activos || 0
-      cards.value[2].value = response.data.resumen.finalizados || 0
+    if (response.resumen) {
+      cards.value[0].value = response.resumen.totalAprendices || 0
+      cards.value[1].value = response.resumen.activos || 0
+      cards.value[2].value = response.resumen.finalizados || 0
     }
   } catch (error) {
     // TODO: Manejar error

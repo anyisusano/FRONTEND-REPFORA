@@ -3,7 +3,7 @@
     <BackButton />
     
     <div class="text-center q-mb-lg">
-      <h1 class="text-weight-bold text-black q-my-md" style="font-size: 3rem;">INSTRUCTOR HOURS</h1>
+      <h1 class="text-weight-bold text-black q-my-md" style="font-size: 3rem;">HORAS DE INSTRUCTOR</h1>
     </div>
 
     <div class="container">
@@ -11,7 +11,7 @@
         :datos="parameters"
         :columnas="columns"
         row-key="_id"
-        no-data-label="No registered parameters"
+        no-data-label="No hay parámetros registrados"
         :rows-per-page-options="[10, 20, 50]"
         :initial-rows-per-page="10"
       >
@@ -24,7 +24,7 @@
               icon="edit"
               @click="handleEdit(props.row)"
             >
-              <q-tooltip>Edit</q-tooltip>
+              <q-tooltip>Editar</q-tooltip>
             </q-btn>
           </q-td>
         </template>
@@ -38,7 +38,7 @@
       max-width="95vw"
     >
       <template #header>
-        <div class="text-h6">Edit Instructor Hour</div>
+        <div class="text-h6">Editar Hora de Instructor</div>
       </template>
 
       <template #body>
@@ -48,20 +48,20 @@
             v-model="editingValue"
             outlined
             dense
-            label="Base Hour"
+            label="Hora Base"
             type="number"
             :rules="[
               validation.requiredRule,
-              val => val > 0 || 'Base hour must be greater than 0'
+              val => val > 0 || 'La hora base debe ser mayor que 0'
             ]"
           />
         </div>
       </template>
 
       <template #footer>
-        <BotonCerrar label="Cancel" @click="handleCloseEdit" />
+        <BotonCerrar label="Cancelar" @click="handleCloseEdit" />
         <BotonEnviar
-          label="Save"
+          label="Guardar"
           @click="handleOpenConfirmation"
           :disable="!isEditingValueValid"
         />
@@ -75,24 +75,24 @@
       max-width="90vw"
     >
       <template #header>
-        <div class="text-h6">Confirm Changes</div>
+        <div class="text-h6">Confirmar Cambios</div>
       </template>
 
       <template #body>
         <div class="q-pa-md">
           <p class="confirmation-text">
-            Are you sure you want to save the changes for <strong>{{ editingParameter?.name }}</strong>?
+            ¿Está seguro de que desea guardar los cambios para <strong>{{ editingParameter?.name }}</strong>?
           </p>
           <p class="confirmation-text">
-            The new value will be: <strong>{{ editingValue }}</strong>
+            El nuevo valor será: <strong>{{ editingValue }}</strong>
           </p>
         </div>
       </template>
 
       <template #footer>
-        <BotonCerrar label="Cancel" @click="handleCloseConfirmation" />
+        <BotonCerrar label="Cancelar" @click="handleCloseConfirmation" />
         <BotonEnviar
-          label="Save"
+          label="Guardar"
           @click="handleConfirm"
           :loading="isSaving"
         />

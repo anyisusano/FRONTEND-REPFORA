@@ -3,19 +3,19 @@
     <BackButton />
     
     <div class="text-center q-mb-lg">
-      <h1 class="text-weight-bold text-black q-my-md title-compact">TRAINING PROCESS</h1>
+      <h1 class="text-weight-bold text-black q-my-md title-compact">PROCESO DE FORMACIÓN</h1>
     </div>
 
     <div class="container">
 
       <q-card class="section-card q-mb-lg">
         <div class="section-header">
-          <div class="header-title">Logbooks and Follow-ups</div>
+          <div class="header-title">Bitácoras y Seguimientos</div>
         </div>
         
         <q-card-section class="section-content">
           <div class="form-row">
-            <label class="form-label">Max logbooks per program</label>
+            <label class="form-label">Máx bitácoras por programa</label>
             <div class="form-input-group">
               <q-select
                 v-model="formData.maxLogsPerProgram"
@@ -24,12 +24,12 @@
                 dense
                 class="custom-select"
               />
-              <span class="input-hint">Units</span>
+              <span class="input-hint">Unidades</span>
             </div>
           </div>
 
           <div class="form-row">
-            <label class="form-label">Follow-ups - Technical/Technologist</label>
+            <label class="form-label">Seguimientos - Técnico/Tecnólogo</label>
             <div class="form-input-group">
               <q-select
                 v-model="formData.followUpsTechnical"
@@ -38,12 +38,12 @@
                 dense
                 class="custom-select"
               />
-              <span class="input-hint">Required</span>
+              <span class="input-hint">Requeridos</span>
             </div>
           </div>
 
           <div class="form-row">
-            <label class="form-label">Follow-ups - Operator</label>
+            <label class="form-label">Seguimientos - Operario</label>
             <div class="form-input-group">
               <q-select
                 v-model="formData.followUpsOperator"
@@ -52,13 +52,13 @@
                 dense
                 class="custom-select"
               />
-              <span class="input-hint">Required</span>
+              <span class="input-hint">Requeridos</span>
             </div>
           </div>
 
           <div class="form-actions">
             <BotonEnviar
-              label="Save Configuration"
+              label="Guardar Configuración"
               @click="handleOpenConfirmation(SECTION_TYPES.LOGS)"
             />
           </div>
@@ -68,12 +68,12 @@
      
       <q-card class="section-card">
         <div class="section-header">
-          <div class="header-title">Validations and Limits</div>
+          <div class="header-title">Validaciones y Límites</div>
         </div>
         
         <q-card-section class="section-content">
           <div class="form-row">
-            <label class="form-label">Max apprentice-fiche records</label>
+            <label class="form-label">Máx registros aprendiz-ficha</label>
             <div class="form-input-group">
               <q-select
                 v-model="formData.maxRecordsPerStudent"
@@ -82,12 +82,12 @@
                 dense
                 class="custom-select"
               />
-              <span class="input-hint">PS Stages</span>
+              <span class="input-hint">Etapas EP</span>
             </div>
           </div>
 
           <div class="form-row">
-            <label class="form-label">Max logbook review time</label>
+            <label class="form-label">Tiempo máx revisión bitácora</label>
             <div class="form-input-group">
               <q-select
                 v-model="formData.maxReviewTime"
@@ -96,13 +96,13 @@
                 dense
                 class="custom-select"
               />
-              <span class="input-hint">Business Days</span>
+              <span class="input-hint">Días Hábiles</span>
             </div>
           </div>
 
           <div class="form-actions">
             <BotonEnviar
-              label="Save Configuration"
+              label="Guardar Configuración"
               @click="handleOpenConfirmation(SECTION_TYPES.VALIDATIONS)"
             />
           </div>
@@ -118,7 +118,7 @@
     >
       <template #header>
         <div class="modal-header-content">
-          <div class="text-h6">Are you sure you want to save the changes?</div>
+          <div class="text-h6">¿Está seguro de que desea guardar los cambios?</div>
           <q-btn
             flat
             round
@@ -134,8 +134,8 @@
         <div class="modal-body-content">
           <p class="confirmation-text">
             {{ currentSection === SECTION_TYPES.LOGS 
-              ? 'Save Logbooks and Follow-ups configuration' 
-              : 'Save Validations and Limits configuration' 
+              ? 'Guardar configuración de Bitácoras y Seguimientos' 
+              : 'Guardar configuración de Validaciones y Límites' 
             }}
           </p>
         </div>
@@ -143,9 +143,9 @@
 
       <template #footer>
         <div class="modal-footer-buttons">
-          <BotonCerrar label="Cancel" @click="handleCloseConfirmation" />
+          <BotonCerrar label="Cancelar" @click="handleCloseConfirmation" />
           <BotonEnviar
-            label="Accept"
+            label="Aceptar"
             @click="handleSaveConfiguration"
             :loading="isSaving"
           />

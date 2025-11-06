@@ -354,7 +354,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { apiClient } from '../../services/apiClient'
+import { getData } from '../../services/apiClient'
 import { useNotifications } from '../../composables/useNotifications'
 import { useFormValidation } from '../../composables/useFormValidation'
 import { useApiData } from '../../composables/useApiData'
@@ -585,8 +585,7 @@ async function handleSubmit() {
 
 async function loadModalities() {
   try {
-    const response = await apiClient.get('/modalities/listModalities')
-    const payload = response?.data
+    const payload = await getData('/modalities/listModalities')
     
     if (payload?.modalities && Array.isArray(payload.modalities)) {
       // Sin usar filter - el backend debe devolver solo modalidades activas
@@ -603,8 +602,7 @@ async function loadModalities() {
 
 async function loadCompanies() {
   try {
-    const response = await apiClient.get('/companies/listCompanies')
-    const payload = response?.data
+    const payload = await getData('/companies/listCompanies')
     
     let data = []
     if (payload?.companies && Array.isArray(payload.companies)) {

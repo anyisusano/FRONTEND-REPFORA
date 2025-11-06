@@ -3,7 +3,7 @@
     <BackButton />
     
     <div class="text-center q-mb-lg">
-      <h1 class="text-weight-bold text-black q-my-md" style="font-size: 3rem;">EMAILS</h1>
+      <h1 class="text-weight-bold text-black q-my-md" style="font-size: 3rem;">CORREOS</h1>
     </div>
 
     <div class="container">
@@ -11,7 +11,7 @@
         :datos="parameters"
         :columnas="columns"
         row-key="_id"
-        no-data-label="No registered email parameters"
+        no-data-label="No hay parámetros de correo registrados"
         :rows-per-page-options="[10, 20, 50]"
         :initial-rows-per-page="10"
       >
@@ -24,7 +24,7 @@
               icon="edit"
               @click="handleEdit(props.row)"
             >
-              <q-tooltip>Edit</q-tooltip>
+              <q-tooltip>Editar</q-tooltip>
             </q-btn>
           </q-td>
         </template>
@@ -38,7 +38,7 @@
       max-width="95vw"
     >
       <template #header>
-        <div class="text-h6">Edit Email Parameter</div>
+        <div class="text-h6">Editar Parámetro de Correo</div>
       </template>
 
       <template #body>
@@ -46,7 +46,7 @@
           <div class="parameter-details q-mb-md">
             <div class="text-h6 q-mb-sm">{{ editingParameter?.name || '-' }}</div>
             <div class="text-caption text-grey-7 q-mb-xs">
-              <strong>Type:</strong> {{ editingParameter?.type || '-' }}
+              <strong>Tipo:</strong> {{ editingParameter?.type || '-' }}
             </div>
             <div v-if="editingParameter?.description" class="text-body2 text-grey-8 q-mb-md">
               📝 {{ editingParameter.description }}
@@ -56,30 +56,30 @@
           <q-input
             v-model="editingValue"
             outlined
-            label="Value"
+            label="Valor"
             :type="editingParameter?.type === 'NUMBER' ? 'number' : 'text'"
             :rules="[
               validation.requiredRule,
               val => {
                 if (editingParameter?.type === 'NUMBER') {
-                  return !isNaN(val) || 'Must be a valid number'
+                  return !isNaN(val) || 'Debe ser un número válido'
                 }
                 return true
               }
             ]"
-            :hint="editingParameter?.type === 'STRING' ? 'Enter text value' : 'Enter numeric value'"
+            :hint="editingParameter?.type === 'STRING' ? 'Ingrese valor de texto' : 'Ingrese valor numérico'"
           />
           
           <div v-if="editingParameter?.updatedAt" class="text-caption text-grey-6 q-mt-sm">
-            Last updated: {{ new Date(editingParameter.updatedAt).toLocaleString() }}
+            Última actualización: {{ new Date(editingParameter.updatedAt).toLocaleString() }}
           </div>
         </div>
       </template>
 
       <template #footer>
-        <BotonCerrar label="Cancel" @click="handleCloseEdit" />
+        <BotonCerrar label="Cancelar" @click="handleCloseEdit" />
         <BotonEnviar
-          label="Save"
+          label="Guardar"
           @click="handleOpenConfirmation"
           :disable="!isEditingValueValid"
         />
@@ -93,24 +93,24 @@
       max-width="90vw"
     >
       <template #header>
-        <div class="text-h6">Confirm Changes</div>
+        <div class="text-h6">Confirmar Cambios</div>
       </template>
 
       <template #body>
         <div class="q-pa-md">
           <p class="confirmation-text">
-            Are you sure you want to save the changes for <strong>{{ editingParameter?.name }}</strong>?
+            ¿Está seguro de que desea guardar los cambios para <strong>{{ editingParameter?.name }}</strong>?
           </p>
           <p class="confirmation-text">
-            The new value will be: <strong>{{ editingValue }}</strong>
+            El nuevo valor será: <strong>{{ editingValue }}</strong>
           </p>
         </div>
       </template>
 
       <template #footer>
-        <BotonCerrar label="Cancel" @click="handleCloseConfirmation" />
+        <BotonCerrar label="Cancelar" @click="handleCloseConfirmation" />
         <BotonEnviar
-          label="Save"
+          label="Guardar"
           @click="handleConfirm"
           :loading="isSaving"
         />

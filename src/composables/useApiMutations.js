@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { apiClient } from '../services/apiClient'
+import { postData, putData, deleteData } from '../services/apiClient'
 import { useNotifications } from './useNotifications'
 
 /**
@@ -29,9 +29,9 @@ export function useApiMutations(baseEndpoint, options = {}) {
     try {
       isSaving.value = true
       const endpoint = customEndpoint || baseEndpoint
-      const response = await apiClient.post(endpoint, data)
+      const response = await postData(endpoint, data)
       notifications.success(createSuccessMessage)
-      return response.data
+      return response
     } catch (error) {
       const msg = error.response?.data?.message || error.response?.data?.msg || error?.message || errorMessage
       notifications.error(msg)
@@ -51,9 +51,9 @@ export function useApiMutations(baseEndpoint, options = {}) {
     try {
       isSaving.value = true
       const endpoint = customEndpoint || `${baseEndpoint}/${id}`
-      const response = await apiClient.put(endpoint, data)
+      const response = await putData(endpoint, data)
       notifications.success(updateSuccessMessage)
-      return response.data
+      return response
     } catch (error) {
       const msg = error.response?.data?.message || error.response?.data?.msg || error?.message || errorMessage
       notifications.error(msg)
@@ -72,9 +72,9 @@ export function useApiMutations(baseEndpoint, options = {}) {
     try {
       isDeleting.value = true
       const endpoint = customEndpoint || `${baseEndpoint}/${id}`
-      const response = await apiClient.delete(endpoint)
+      const response = await deleteData(endpoint)
       notifications.success(deleteSuccessMessage)
-      return response.data
+      return response
     } catch (error) {
       const msg = error.response?.data?.message || error.response?.data?.msg || error?.message || errorMessage
       notifications.error(msg)
@@ -104,7 +104,7 @@ export function useApiMutations(baseEndpoint, options = {}) {
         const successMessage = endpointOrMessage
         const endpoint = `${baseEndpoint}/${action}`
         
-        await apiClient.put(`${endpoint}/${id}`)
+        await putData(`${endpoint}/${id}`)
         notifications.success(successMessage)
         callback()
         return
@@ -113,7 +113,7 @@ export function useApiMutations(baseEndpoint, options = {}) {
       // Patrón 1: toggleStatus(id, status, endpoint)
       const status = statusOrAction
       const endpoint = endpointOrMessage || baseEndpoint
-      await apiClient.put(`${endpoint}/${id}`)
+      await putData(`${endpoint}/${id}`)
       const statusText = status === 0 ? 'activado' : 'desactivado'
       notifications.success(`Registro ${statusText} exitosamente`)
     } catch (error) {

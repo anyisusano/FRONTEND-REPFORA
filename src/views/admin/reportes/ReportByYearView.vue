@@ -24,7 +24,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import StatsCard from 'src/components/cards/StatsCard.vue'
 import MainTable from 'src/components/tables/MainTable.vue'
-import axios from 'axios'
+import { getData } from '../../../services/apiClient'
 import BackButton from 'src/components/BackButton.vue'
 
 // Capturar el año enviado desde el formulario anterior
@@ -54,9 +54,8 @@ const datos = ref([])
 // Llamada al backend con el año como parámetro
 const obtenerDatos = async () => {
   try {
-    const response = await axios.get('/api/reportes/anio', {
-      params: { anio: filtros.value.anio }
-    })
+    const url = `/reportes/anio${filtros.value.anio ? `?anio=${filtros.value.anio}` : ''}`
+    const response = await getData(url)
 
     //  Estructura esperada del backend:
     // {
@@ -64,12 +63,12 @@ const obtenerDatos = async () => {
     //   resumen: { activas: 15, finalizadas: 10, canceladas: 2 }
     // }
 
-    datos.value = response.data.fichas || []
+    datos.value = response.fichas || []
 
-    if (response.data.resumen) {
-      cards.value[0].value = response.data.resumen.activas || 0
-      cards.value[1].value = response.data.resumen.finalizadas || 0
-      cards.value[2].value = response.data.resumen.canceladas || 0
+    if (response.resumen) {
+      cards.value[0].value = response.resumen.activas || 0
+      cards.value[1].value = response.resumen.finalizadas || 0
+      cards.value[2].value = response.resumen.canceladas || 0
     }
   } catch (error) {
     // TODO: Manejar error

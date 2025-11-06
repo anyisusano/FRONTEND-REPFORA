@@ -339,7 +339,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useQuasar } from 'quasar'
-import { apiClient } from '../../services/apiClient'
+import { getData, postData, putData } from '../../services/apiClient'
 import { useNotifications } from '../../composables/useNotifications'
 import { useFormValidation } from '../../composables/useFormValidation'
 import { useTableFiltering } from '../../composables/useTableFiltering'
@@ -544,8 +544,7 @@ async function fetchRegistrations() {
         }
 
         // Usar la ruta con query parameter
-        const response = await apiClient.get(`/registrations/listRegistrations?apprentice=${apprenticeId}`)
-        const payload = response?.data
+        const payload = await getData(`/registrations/listRegistrations?apprentice=${apprenticeId}`)
         let data = []
         if (payload?.registrations && Array.isArray(payload.registrations)) {
             data = payload.registrations
@@ -791,11 +790,7 @@ async function createRegistration() {
     // El backend espera 'uploadedDocuments' (array). En multipart enviamos un solo archivo bajo esa clave.
     formData.append('uploadedDocuments', uploadedFile.value)
 
-        const response = await apiClient.post('/registrations/saveRegistration', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
+        await postData('/registrations/saveRegistration', formData)
 
         notifications.success('Registro de EP creado exitosamente. Pendiente de validación administrativa.')
         editModalRef.value?.closeDialog()
@@ -855,11 +850,7 @@ async function updateRegistration() {
             formData.append('dailyHours', itemBeingEdited.value.daily_hours)
             formData.append('uploadedDocuments', uploadedFile.value)
 
-            await apiClient.put(`/registrations/updateRegistration/${itemBeingEdited.value._id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
+            await putData(`/registrations/updateRegistration/${itemBeingEdited.value._id}`, formData)
         } else {
             // Si no hay nuevo archivo, solo actualizar datos
             const updateData = {
@@ -871,7 +862,7 @@ async function updateRegistration() {
                 dailyHours: itemBeingEdited.value.daily_hours
             }
 
-            await apiClient.put(`/registrations/updateRegistration/${itemBeingEdited.value._id}`, updateData)
+            await putData(`/registrations/updateRegistration/${itemBeingEdited.value._id}`, updateData)
         }
 
         notifications.success('Registro actualizado exitosamente')
@@ -911,7 +902,7 @@ async function handleSendRegistro(record) {
                 admin_observations: 'Registro enviado para validación'
             }
             
-            await apiClient.put(`/registrations/validateRegistration?apprentice=${record._id}`, validationData)
+            await putData(`/registrations/validateRegistration?apprentice=${record._id}`, validationData)
             notifications.success('Registro enviado exitosamente para validación')
             await fetchRegistrations()
         } catch (error) {
@@ -941,7 +932,7 @@ function handleSendFromModal() {
                 admin_observations: 'Registro enviado para validación'
             }
             
-            await apiClient.put(`/registrations/validateRegistration?apprentice=${itemBeingEdited.value._id}`, validationData)
+            await putData(`/registrations/validateRegistration?apprentice=${itemBeingEdited.value._id}`, validationData)
             notifications.success('Registro enviado exitosamente para validación')
             editModalRef.value?.closeDialog()
             await fetchRegistrations()
@@ -961,8 +952,7 @@ function handleSendFromModal() {
 
 async function loadModalities() {
     try {
-        const response = await apiClient.get('/modalities/listModalities')
-        const payload = response?.data
+        const payload = await getData('/modalities/listModalities')
 
         let data = []
         if (payload?.modalities && Array.isArray(payload.modalities)) {
@@ -994,8 +984,7 @@ async function loadModalities() {
 
 async function loadCompanies() {
     try {
-        const response = await apiClient.get('/companies/listCompanies')
-        const payload = response?.data
+        const payload = await getData('/companies/listCompanies')
 
         let data = []
         if (payload?.companies && Array.isArray(payload.companies)) {

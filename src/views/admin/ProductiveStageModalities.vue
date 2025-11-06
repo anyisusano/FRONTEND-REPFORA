@@ -303,7 +303,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { apiClient } from '../../services/apiClient'
+import { postData } from '../../services/apiClient'
 import { useNotifications } from '../../composables/useNotifications'
 import { useFormValidation } from '../../composables/useFormValidation'
 import { useFileUpload } from '../../composables/useFileUpload'
@@ -549,42 +549,7 @@ async function handleMassiveUpload() {
     const formData = new FormData()
     formData.append('file', fileToSend, fileToSend.name)
     
-    const auth = JSON.parse(localStorage.getItem('auth') || '{}')
-    
-    // Crear un AbortController para timeout
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 120000) // 2 minutos
-    
-    const resp = await fetch('https://repfora-ep-backend.onrender.com/api/modalities/loadMassive', {
-      method: 'POST',
-      headers: {
-        'x-token': auth.token || ''
-      },
-      body: formData,
-      signal: controller.signal
-    })
-    
-    clearTimeout(timeoutId)
-    
-    if (!resp.ok) {
-      const errorData = await resp.json().catch(() => ({}))
-      
-      if (resp.status === 400) {
-        throw new Error(errorData.msg || 'Archivo inválido o formato incorrecto')
-      } else if (resp.status === 401) {
-        throw new Error('No autorizado. Por favor, inicia sesión nuevamente.')
-      } else if (resp.status === 413) {
-        throw new Error('El archivo es demasiado grande')
-      } else if (resp.status === 422) {
-        throw new Error(errorData.msg || 'Error de validación en los datos del archivo')
-      } else if (resp.status === 500) {
-        throw new Error('Error interno del servidor. Por favor, intenta de nuevo más tarde.')
-      } else {
-        throw new Error(errorData.msg || `Error del servidor: ${resp.status}`)
-      }
-    }
-    
-    const data = await resp.json()
+    const data = await postData('/modalities/loadMassive', formData, { timeout: 120000 })
     
     notifications.success(data.msg || 'Modalidades cargadas exitosamente')
     uploadModalRef.value?.closeDialog()
@@ -594,12 +559,20 @@ async function handleMassiveUpload() {
   } catch (error) {    
     let errorMessage = 'Error al cargar el archivo'
     
-    if (error.name === 'AbortError') {
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
       errorMessage = 'La carga del archivo excedió el tiempo límite de 2 minutos. El servidor puede estar inactivo (Render free tier). Por favor, intenta nuevamente en unos minutos.'
-    } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-      errorMessage = 'Error de conexión. El servidor puede estar inactivo (Render free tier). Por favor, intenta nuevamente en unos minutos.'
+    } else if (error.response?.status === 400) {
+      errorMessage = error.response?.data?.msg || 'Archivo inválido o formato incorrecto'
+    } else if (error.response?.status === 401) {
+      errorMessage = 'No autorizado. Por favor, inicia sesión nuevamente.'
+    } else if (error.response?.status === 413) {
+      errorMessage = 'El archivo es demasiado grande'
+    } else if (error.response?.status === 422) {
+      errorMessage = error.response?.data?.msg || 'Error de validación en los datos del archivo'
+    } else if (error.response?.status === 500) {
+      errorMessage = 'Error interno del servidor. Por favor, intenta de nuevo más tarde.'
     } else if (error.message) {
-      errorMessage = error.message
+      errorMessage = error.response?.data?.msg || error.message
     }
     
     notifications.error(errorMessage)

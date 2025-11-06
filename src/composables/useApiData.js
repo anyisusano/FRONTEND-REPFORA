@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { apiClient } from '../services/apiClient'
+import { getData } from '../services/apiClient'
 import { useNotifications } from './useNotifications'
 
 /**
@@ -44,29 +44,28 @@ export function useApiData(endpoint, options = {}) {
         url = `${url}${url.includes('?') ? '&' : '?'}${params.toString()}`
       }
       
-      const response = await apiClient.get(url)
-      const responseData = response?.data
+      const responseData = await getData(url)
       
       // Extraer datos del backend - manejar diferentes estructuras de respuesta
       // El backend puede devolver datos en múltiples formatos según la colección Postman
       let extractedData = null
       
-      // Caso 1: response.data es directamente un array
+      // Caso 1: responseData es directamente un array
       if (Array.isArray(responseData)) {
         extractedData = responseData
       }
-      // Caso 2: response.data.msg existe y es un array (formato más común según Postman)
+      // Caso 2: responseData.msg existe y es un array (formato más común según Postman)
       else if (responseData?.msg && Array.isArray(responseData.msg)) {
         extractedData = responseData.msg
       }
-      // Caso 3: response.data.data existe y es un array
+      // Caso 3: responseData.data existe y es un array
       else if (responseData?.data && Array.isArray(responseData.data)) {
         extractedData = responseData.data
       }
       // Caso 4: Propiedades específicas comunes del backend (prioridad)
       else if (responseData && typeof responseData === 'object') {
-        // Buscar propiedades comunes primero
-        const commonProperties = ['registrations', 'apprentices', 'modalities', 'companies', 
+        // Buscar propiedades comunes primero - 'companies' tiene prioridad para este endpoint
+        const commonProperties = ['companies', 'registrations', 'apprentices', 'modalities', 
                                    'instructors', 'news', 'novedades', 'parameters', 'projects', 'activities',
                                    'fiches', 'documents', 'requests', 'logs']
         let propIndex = 0

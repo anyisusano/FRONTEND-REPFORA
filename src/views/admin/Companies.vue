@@ -32,17 +32,17 @@
           />
         </div>
         <div class="col-12 col-md-4 text-right">
-          <div class="row q-gutter-sm justify-end no-wrap">
+          <div class="row q-gutter-sm justify-end no-wrap companies-actions">
             <BotonIngresar
+              class="companies-actions__btn"
               label="Carga Masiva"
               @click="handleOpenUploadDialog"
               icon="upload_file"
-              style="height: 36px;"
             />
             <BotonIngresar
+              class="companies-actions__btn companies-actions__btn--primary"
               label="+ Nueva Empresa"
               @click="handleOpenCreateDialog"
-              style="height: 36px; padding: 8px 6px; justify-content: flex-start;"
             />
           </div>
         </div>
@@ -331,8 +331,6 @@ import { apiClient } from '../../services/apiClient'
 import { useNotifications } from '../../composables/useNotifications'
 import { useFormValidation } from '../../composables/useFormValidation'
 import { useFileUpload } from '../../composables/useFileUpload'
-// useTableFiltering está deprecado - el filtrado debe hacerse en el backend
-import { useApiData } from '../../composables/useApiData'
 import { useApiMutations } from '../../composables/useApiMutations'
 import { useColombia } from '../../composables/useColombia'
 import { STATUS, STATUS_LABELS, STATUS_OPTIONS, VALIDATION_RULES, FILE_SIZE_LIMITS } from '../../constants/index'
@@ -349,17 +347,80 @@ const fileUpload = useFileUpload()
 
 const { departamentos, getCiudadesByDepartamento } = useColombia()
 
-// Usar composables para datos y mutaciones
-// Los datos vienen crudos del backend sin transformaciones
-const { 
-  data: companies, 
-  isLoading, 
-  fetchData: fetchCompanies 
-} = useApiData('/companies/listCompanies', {
-  showEmptyInfo: true,
-  emptyMessage: 'No hay empresas registradas',
-  errorMessage: 'Error al cargar empresas'
-})
+// Usar apiClient directamente para obtener la lista de empresas
+const companies = ref([])
+const isLoading = ref(false)
+
+async function fetchCompanies(queryParams = {}) {
+  try {
+    isLoading.value = true
+    companies.value = []
+
+    // Construir URL con query params si existen
+    let url = '/companies/listCompanies'
+    if (Object.keys(queryParams).length > 0) {
+      const params = new URLSearchParams()
+      const keys = Object.keys(queryParams)
+      let keyIndex = 0
+      while (keyIndex < keys.length) {
+        const key = keys[keyIndex]
+        if (queryParams[key] !== undefined && queryParams[key] !== null && queryParams[key] !== '') {
+          params.append(key, queryParams[key])
+        }
+        keyIndex++
+      }
+      url = `${url}${url.includes('?') ? '&' : '?'}${params.toString()}`
+    }
+
+    const response = await apiClient.get(url)
+    const payload = response?.data
+
+    // Extraer el primer array válido de la respuesta (soporta msg anidado)
+    function findFirstArray(obj, depth = 0) {
+      if (!obj || typeof obj !== 'object' || depth > 4) return null
+      if (Array.isArray(obj)) return obj
+      const keys = Object.keys(obj)
+      let i = 0
+      while (i < keys.length) {
+        const k = keys[i]
+        const val = obj[k]
+        if (Array.isArray(val)) return val
+        if (val && typeof val === 'object') {
+          const nested = findFirstArray(val, depth + 1)
+          if (nested) return nested
+        }
+        i++
+      }
+      return null
+    }
+
+    let list = []
+    // Intentar propiedades directas
+    if (payload && Array.isArray(payload)) list = payload
+    else if (payload?.msg && Array.isArray(payload.msg)) list = payload.msg
+    else if (payload?.companies && Array.isArray(payload.companies)) list = payload.companies
+    else if (payload?.data && Array.isArray(payload.data)) list = payload.data
+    else {
+      // Buscar arrays anidados en payload o payload.msg
+      list = findFirstArray(payload?.msg) || findFirstArray(payload) || []
+    }
+    console.debug('[Companies] extracted list length:', list.length)
+
+    companies.value = list
+    if (companies.value.length === 0) {
+      // Mostrar info si no hay empresas
+      notifications.info('No hay empresas registradas')
+    }
+    return companies.value
+  } catch (error) {
+    const msg = error.response?.data?.msg || error.response?.data?.message || error?.message || 'Error al cargar empresas'
+    notifications.error(msg)
+    companies.value = []
+    throw error
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const { 
   isSaving,
@@ -529,16 +590,6 @@ function handleOpenCreateDialog() {
   editModalRef.value?.openDialog()
 }
 
-/**
- * Cierra el modal de edición/creación y limpia el formulario
- */
-function handleCloseDialog() {
-  editModalRef.value?.closeDialog()
-  if (formRef.value) {
-    formRef.value.resetValidation()
-  }
-}
-
 // ==================== MANEJADORES DE FORMULARIO ====================
 
 /**
@@ -567,35 +618,34 @@ async function handleSubmit() {
   }
   
   if (isEditing.value) {
+    // Usar apiClient directamente para actualizar
     try {
-      await updateCompanyWithEndpoint(
-        itemBeingEdited.value._id,
-        companyData,
-        () => {
-          editModalRef.value?.closeDialog()
-          if (formRef.value) {
-            formRef.value.resetValidation()
-          }
-          fetchCompanies()
-        }
-      )
+      isSaving.value = true
+      const res = await apiClient.put(`/companies/updateCompanies/${itemBeingEdited.value._id}`, companyData)
+      notifications.success('Empresa actualizada exitosamente')
+      editModalRef.value?.closeDialog()
+      if (formRef.value) formRef.value.resetValidation()
+      await fetchCompanies()
     } catch (error) {
-      // Error ya manejado por useApiMutations
+      const msg = error.response?.data?.msg || error.response?.data?.message || error?.message || 'Error al actualizar empresa'
+      notifications.error(msg)
+    } finally {
+      isSaving.value = false
     }
   } else {
+    // Usar apiClient directamente para crear
     try {
-      await createCompanyWithEndpoint(
-        companyData,
-        () => {
-          editModalRef.value?.closeDialog()
-          if (formRef.value) {
-            formRef.value.resetValidation()
-          }
-          fetchCompanies()
-        }
-      )
+      isSaving.value = true
+      const res = await apiClient.post('/companies/saveCompanies', companyData)
+      notifications.success('Empresa creada exitosamente')
+      editModalRef.value?.closeDialog()
+      if (formRef.value) formRef.value.resetValidation()
+      await fetchCompanies()
     } catch (error) {
-      // Error ya manejado por useApiMutations
+      const msg = error.response?.data?.msg || error.response?.data?.message || error?.message || 'Error al crear empresa'
+      notifications.error(msg)
+    } finally {
+      isSaving.value = false
     }
   }
 }
@@ -628,15 +678,6 @@ function handleOpenUploadDialog() {
   uploadFile.value = null
   uploadModalRef.value?.openDialog()
 }
-
-/**
- * Cierra el modal de carga masiva y limpia el archivo
- */
-function handleCloseUploadDialog() {
-  uploadFile.value = null
-  uploadModalRef.value?.closeDialog()
-}
-
 /**
  * Procesa la carga masiva de empresas desde archivo Excel/CSV
  */
@@ -656,40 +697,35 @@ async function handleMassiveUpload() {
     const formData = new FormData()
     formData.append('file', fileToSend, fileToSend.name)
     
-    const auth = JSON.parse(localStorage.getItem('auth') || '{}')
-    
-    // Crear un AbortController para timeout
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 120000) // 2 minutos
-    
-    const resp = await fetch('https://repfora-ep-backend.onrender.com/api/companies/loadMassiveCompanie', {
-      method: 'POST',
-      headers: {
-        'x-token': auth?.token || ''
-      },
-      body: formData,
-      signal: controller.signal
-    })
-    
-    clearTimeout(timeoutId)
-    
-    const data = await resp.json().catch(() => ({}))
-    
-    if (!resp.ok) {
-      throw { response: { status: resp.status, data } }
+    // Usar apiClient (axios) para enviar FormData y aprovechar interceptores (x-token)
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 120000) // 2 minutos
+
+      const response = await apiClient.post('/companies/loadMassiveCompanie', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        signal: controller.signal
+      })
+
+      clearTimeout(timeoutId)
+
+      const data = response?.data || {}
+
+      const count = data?.count || data?.data?.count || data?.companiesCreated || data?.total || 0
+      let message = data?.message || data?.msg || 'Carga masiva exitosa'
+
+      if (count > 0 && !message.includes(count.toString())) {
+        message = `${message}. ${count} empresa${count !== 1 ? 's' : ''} importada${count !== 1 ? 's' : ''}.`
+      }
+
+      notifications.success(message)
+      uploadFile.value = null
+      uploadModalRef.value?.closeDialog()
+      await fetchCompanies()
+    } catch (error) {
+      // Propagar al catch general abajo manejando como antes
+      throw error
     }
-    
-    const count = data?.count || data?.data?.count || data?.companiesCreated || data?.total || 0
-    let message = data?.message || data?.msg || 'Carga masiva exitosa'
-    
-    if (count > 0 && !message.includes(count.toString())) {
-      message = `${message}. ${count} empresa${count !== 1 ? 's' : ''} importada${count !== 1 ? 's' : ''}.`
-    }
-    
-    notifications.success(message)
-    uploadFile.value = null
-    uploadModalRef.value?.closeDialog()
-    await fetchCompanies()
   } catch (error) {    const status = error?.response?.status
     const payload = error?.response?.data || {}
     let errorMessage = 'Error al cargar el archivo.'
@@ -751,6 +787,73 @@ onMounted(() => {
 .container
   max-width: 1400px
   margin: 0 auto
+
+.companies-actions
+  display: flex
+  gap: 12px
+  align-items: center
+  justify-content: flex-end
+
+.companies-actions__btn
+  /* Hacer que ambos botones ocupen el mismo espacio (igual ancho) */
+  flex: 1 1 0
+  min-width: 120px
+  max-width: 420px
+  max-height: 48px
+  display: flex
+  align-items: center
+  justify-content: center
+
+.companies-actions__btn--primary
+  /* dar más presencia al botón + Nueva Empresa (misma apariencia que el otro) */
+  .boton-ingresar
+    padding: 10px 18px
+
+/* Ajustes del botón base dentro del contenedor para mantener altura y tamaño uniforme */
+.companies-actions__btn .boton-ingresar
+  height: 44px
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  padding: 8px 16px
+  font-size: 15px
+  box-sizing: border-box
+
+/* Ajuste del icono dentro del botón */
+.companies-actions__btn .q-icon
+  font-size: 20px
+  margin-right: 8px
+
+/* Responsive: en pantallas pequeñas apilar botones y usar ancho completo */
+@media (max-width: 1024px)
+  .companies-actions__btn .boton-ingresar
+    height: 42px
+    font-size: 14px
+    padding: 7px 14px
+  .companies-actions__btn .q-icon
+    font-size: 18px
+
+@media (max-width: 600px)
+  .companies-actions
+    flex-direction: column-reverse
+    align-items: stretch
+    width: 100%
+
+  .companies-actions__btn
+    flex: none
+    width: 100%
+    max-width: none
+    display: block
+
+  .companies-actions__btn .boton-ingresar
+    width: 100%
+    box-sizing: border-box
+    padding: 10px 12px
+    height: 44px
+    font-size: 14px
+  .companies-actions__btn .q-icon
+    margin-right: 10px
+    font-size: 18px
 
 .section-title
   color: var(--color-primary)

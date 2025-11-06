@@ -7,8 +7,9 @@
     </div>
     
     <div class="container">
+      
       <div class="row items-center q-mb-md q-gutter-y-sm">
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-6">
           <q-input
             v-model="searchTerm"
             dense
@@ -20,7 +21,7 @@
             </template>
           </q-input>
         </div>
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-6">
           <q-select
             outlined
             dense
@@ -30,21 +31,6 @@
             map-options
             label="Estado"
           />
-        </div>
-        <div class="col-12 col-md-4 text-right">
-          <div class="row q-gutter-sm justify-end no-wrap">
-            <BotonIngresar
-              label="Carga Masiva"
-              @click="handleOpenUploadDialog"
-              icon="upload_file"
-              style="height: 36px;"
-            />
-            <BotonIngresar
-              label="+ Nuevo Aprendiz"
-              @click="handleOpenCreateDialog"
-              style="height: 36px; padding: 8px 6px; justify-content: flex-start;"
-            />
-          </div>
         </div>
       </div>
 
@@ -148,10 +134,6 @@
               <div class="data-row">
                 <div class="text-weight-bold">Email Institucional:</div>
                 <div class="data-value">{{ getInstitutionalEmail(selectedItem) || '-' }}</div>
-              </div>
-              <div class="data-row">
-                <div class="text-weight-bold">Ficha:</div>
-                <div class="data-value">{{ getRecordNumber(selectedItem) || '-' }}</div>
               </div>
             </div>
           </div>
@@ -328,14 +310,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { apiClient } from '../../services/apiClient'
+import { ref, onMounted, watch, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getData, postData, putData } from '../../services/apiClient'
 import { useNotifications } from '../../composables/useNotifications'
 import { useFormValidation } from '../../composables/useFormValidation'
 import { useFileUpload } from '../../composables/useFileUpload'
-// useTableFiltering está deprecado - el filtrado debe hacerse en el backend
-import { useApiData } from '../../composables/useApiData'
-import { useApiMutations } from '../../composables/useApiMutations'
 import { STATUS, STATUS_LABELS, STATUS_OPTIONS, VALIDATION_RULES, FILE_SIZE_LIMITS, DOCUMENT_TYPE_OPTIONS } from '../../constants/index'
 import BackButton from '../../components/BackButton.vue'
 import BotonIngresar from '../../components/BotonIngresar.vue'
@@ -344,31 +324,16 @@ import BotonCerrar from '../../components/BotonCerrar.vue'
 import maintable from '../../components/tables/maintable.vue'
 import modalComponent from '../../components/modals/modalComponent.vue'
 
+const route = useRoute()
+const router = useRouter()
 const notifications = useNotifications()
 const validation = useFormValidation()
 const fileUpload = useFileUpload()
 
-// Usar composables para datos y mutaciones
-const { 
-  data: apprentices, 
-  isLoading, 
-  fetchData: fetchApprentices 
-} = useApiData('/apprentices/listApprentice', {
-  showEmptyInfo: true,
-  emptyMessage: 'No hay aprendices registrados',
-  errorMessage: 'Error al cargar aprendices'
-})
-
-const { 
-  isSaving,
-  create: createApprentice,
-  update: updateApprentice,
-  toggleStatus
-} = useApiMutations('/apprentices', {
-  createSuccessMessage: 'Aprendiz creado exitosamente',
-  updateSuccessMessage: 'Aprendiz actualizado exitosamente',
-  errorMessage: 'Error en la operación'
-})
+// State
+const apprentices = ref([])
+const isLoading = ref(false)
+const isSaving = ref(false)
 
 const selectedItem = ref(null)
 const isEditing = ref(false)
@@ -396,6 +361,17 @@ const itemBeingEdited = ref({
 // Filtrado debe hacerse en el backend - usar queryParams en fetchApprentices
 const searchTerm = ref('')
 const statusFilter = ref('all')
+const ficheFilter = ref('') // Número de ficha desde la URL
+
+// Computed para construir los query params como objeto
+const queryParams = computed(() => {
+  const params = {}
+  if (ficheFilter.value) {
+    params.recordNumber = ficheFilter.value
+  }
+  return params
+})
+
 // Los datos vienen filtrados del backend
 const filteredItems = apprentices
 
@@ -449,6 +425,63 @@ function getRecordNumber(apprentice) {
 }
 
 // ==================== FUNCIONES DE UI ====================
+
+// Función para cargar aprendices
+const fetchApprentices = async (params = {}) => {
+  isLoading.value = true
+  try {
+    // Construir URL con query params
+    let url = '/apprentices/listApprentice'
+    if (Object.keys(params).length > 0) {
+      const queryString = new URLSearchParams(params).toString()
+      url = `${url}?${queryString}`
+    }
+    
+    const response = await getData(url)
+    
+    // Extraer datos - puede venir en diferentes estructuras
+    let data = []
+    
+    // Caso 1: response.Apprentice es array
+    if (Array.isArray(response?.Apprentice)) {
+      data = response.Apprentice
+    }
+    // Caso 2: response.apprentices es array
+    else if (Array.isArray(response?.apprentices)) {
+      data = response.apprentices
+    }
+    // Caso 3: response.data es array
+    else if (Array.isArray(response?.data)) {
+      data = response.data
+    }
+    // Caso 4: response.msg es array
+    else if (Array.isArray(response?.msg)) {
+      data = response.msg
+    }
+    // Caso 5: response.msg es objeto con propiedad que contiene array
+    else if (response?.msg && typeof response.msg === 'object') {
+      const msgKeys = Object.keys(response.msg)
+      for (const key of msgKeys) {
+        if (Array.isArray(response.msg[key])) {
+          data = response.msg[key]
+          break
+        }
+      }
+    }
+    
+    apprentices.value = data
+    
+    if (apprentices.value.length === 0 && Object.keys(params).length === 0) {
+      notifications.info('No hay aprendices registrados')
+    }
+  } catch (error) {
+    apprentices.value = []
+    const errorMsg = error.response?.data?.message || error.response?.data?.msg || error.message || 'Error al cargar aprendices'
+    notifications.error(errorMsg)
+  } finally {
+    isLoading.value = false
+  }
+}
 
 /**
  * Obtiene el color del badge según el estado
@@ -540,6 +573,8 @@ async function handleSubmit() {
     return
   }
   
+  isSaving.value = true
+  
   const apprenticeData = {
     documentNumber: itemBeingEdited.value.documentNumber,
     documentType: itemBeingEdited.value.documentType,
@@ -552,35 +587,40 @@ async function handleSubmit() {
     phone: itemBeingEdited.value.phone
   }
   
-  if (isEditing.value) {
-    await updateApprentice(
-      itemBeingEdited.value._id,
-      apprenticeData,
-      () => {
-        editModalRef.value?.closeDialog()
-        if (formRef.value) {
-          formRef.value.resetValidation()
-        }
-        fetchApprentices()
-      },
-      'updateEntireApprentice'
-    )
-  } else {
-    await createApprentice(
-      apprenticeData,
-      () => {
-        editModalRef.value?.closeDialog()
-        if (formRef.value) {
-          formRef.value.resetValidation()
-        }
-        fetchApprentices()
-      },
-      'register'
-    )
+  try {
+    if (isEditing.value) {
+      // Editar aprendiz
+      await putData(`/apprentices/updateEntireApprentice/${itemBeingEdited.value._id}`, apprenticeData)
+      notifications.success('Aprendiz actualizado exitosamente')
+    } else {
+      // Crear nuevo aprendiz
+      await postData('/apprentices/register', apprenticeData)
+      notifications.success('Aprendiz creado exitosamente')
+    }
+    
+    editModalRef.value?.closeDialog()
+    if (formRef.value) {
+      formRef.value.resetValidation()
+    }
+    await fetchApprentices(queryParams.value)
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || error.response?.data?.msg || error.message || 'Error al guardar el aprendiz'
+    notifications.error(errorMsg)
+  } finally {
+    isSaving.value = false
   }
 }
 
 // ==================== MANEJADORES DE ESTADO ====================
+
+/**
+ * Limpia el filtro de ficha y recarga todos los aprendices
+ */
+function handleClearFicheFilter() {
+  ficheFilter.value = ''
+  router.push({ name: 'Apprentices' })
+  fetchApprentices({})
+}
 
 /**
  * Activa o desactiva un aprendiz
@@ -589,14 +629,19 @@ async function handleSubmit() {
 async function handleToggleStatus(apprentice) {
   const isActive = apprentice.status === STATUS.ACTIVE
   const action = isActive ? 'disableApprentice' : 'activateApprentice'
-  const successMessage = `Aprendiz ${isActive ? 'desactivado' : 'activado'} exitosamente`
   
-  await toggleStatus(
-    apprentice._id,
-    action,
-    successMessage,
-    fetchApprentices
-  )
+  isSaving.value = true
+  
+  try {
+    await putData(`/apprentices/${action}/${apprentice._id}`)
+    notifications.success(`Aprendiz ${isActive ? 'desactivado' : 'activado'} exitosamente`)
+    await fetchApprentices(queryParams.value)
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || error.response?.data?.msg || error.message || 'Error al cambiar el estado'
+    notifications.error(errorMsg)
+  } finally {
+    isSaving.value = false
+  }
 }
 
 // ==================== MANEJADORES DE CARGA MASIVA ====================
@@ -711,7 +756,24 @@ async function handleMassiveUpload() {
  * Carga los aprendices al montar el componente
  */
 onMounted(() => {
-  fetchApprentices()
+  if (route.query.recordNumber) {
+    ficheFilter.value = route.query.recordNumber
+  }
+  
+  const params = queryParams.value
+  fetchApprentices(params)
+})
+
+// Watch para actualizar cuando cambie el parámetro de la URL
+watch(() => route.query.recordNumber, (newRecordNumber) => {
+  if (newRecordNumber) {
+    ficheFilter.value = newRecordNumber
+    const params = queryParams.value
+    fetchApprentices(params)
+  } else {
+    ficheFilter.value = ''
+    fetchApprentices({})
+  }
 })
 </script>
 

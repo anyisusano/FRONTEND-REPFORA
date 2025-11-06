@@ -7,34 +7,96 @@
     </div>
 
     <div class="container">
-      <div class="row justify-center">
+      <div class="row justify-center q-mb-lg">
         <div class="col-12 col-md-8">
-          <q-select
-            ref="selectRef"
-            v-model="selectedFiche"
-            :options="fiches"
+          <q-input
+            v-model="ficheNumber"
             outlined
-            dense
-            use-input
-            input-debounce="500"
-            option-label="number"
-            option-value="_id"
-            emit-value
-            map-options
-            label="Seleccionar ficha"
+            placeholder="Escribe el número de la ficha..."
             clearable
-            :loading="isLoading"
-            @filter="handleFilterFiches"
-            @popup-show="handlePopupShow"
+            class="search-input"
+            @keyup.enter="searchFiche"
           >
-            <template v-slot:no-option>
-              <q-item>
-                <q-item-section class="text-grey">
-                  Busca la ficha que necesites 
-                </q-item-section>
-              </q-item>
+            <template v-slot:append>
+              <q-btn
+                flat
+                round
+                dense
+                icon="search"
+                class="search-btn"
+                @click="searchFiche"
+                :loading="isLoading"
+                :disable="!ficheNumber || ficheNumber.trim() === ''"
+              >
+                <q-tooltip>Buscar</q-tooltip>
+              </q-btn>
             </template>
-          </q-select>
+          </q-input>
+        </div>
+      </div>
+
+      <!-- Resultados de búsqueda -->
+      <div v-if="searchResults.length > 0" class="row justify-center">
+        <div class="col-12 col-md-8">
+          <q-card class="results-card">
+            <q-card-section class="results-header">
+              <div class="text-h6">Resultados de búsqueda</div>
+              <div class="text-caption text-grey-7">
+                {{ searchResults.length }} ficha{{ searchResults.length !== 1 ? 's' : '' }} encontrada{{ searchResults.length !== 1 ? 's' : '' }}
+              </div>
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="q-pa-none">
+              <q-list>
+                <q-item
+                  v-for="fiche in searchResults"
+                  :key="fiche._id"
+                  clickable
+                  v-ripple
+                  @click="selectFiche(fiche)"
+                  class="result-item"
+                >
+                  <q-item-section avatar>
+                    <q-avatar color="primary" text-color="white" size="48px">
+                      <q-icon name="school" size="24px" />
+                    </q-avatar>
+                  </q-item-section>
+                  
+                  <q-item-section>
+                    <q-item-label class="fiche-number">
+                      Ficha {{ fiche.number }}
+                    </q-item-label>
+                    <q-item-label caption v-if="fiche.program.name" class="fiche-program-name">
+                      {{ fiche.program.name }}
+                    </q-item-label>
+                  </q-item-section>
+                  
+                  <q-item-section side>
+                    <q-icon name="arrow_forward_ios" color="primary" size="20px" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-card-section>
+          </q-card>
+        </div>
+      </div>
+
+      <!-- Mensaje cuando no hay resultados -->
+      <div v-else-if="hasSearched && !isLoading" class="row justify-center">
+        <div class="col-12 col-md-8">
+          <q-banner class="no-results-banner" rounded>
+            <template v-slot:avatar>
+              <q-avatar color="grey-4" text-color="grey-7" size="48px">
+                <q-icon name="search_off" size="28px" />
+              </q-avatar>
+            </template>
+            <div class="text-subtitle1 text-weight-medium q-mb-xs">
+              No se encontraron fichas
+            </div>
+            <div class="text-body2 text-grey-7">
+              No hay fichas registradas con el número: <strong>{{ ficheNumber }}</strong>
+            </div>
+          </q-banner>
         </div>
       </div>
     </div>
@@ -42,79 +104,180 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useApiData } from '../../composables/useApiData'
+import { getData } from '../../services/apiClient'
 import { useNotifications } from '../../composables/useNotifications'
 import BackButton from '../../components/BackButton.vue'
 
 const router = useRouter()
 const notifications = useNotifications()
 
-const selectedFiche = ref(null)
-const selectRef = ref(null)
-const searchTerm = ref('')
+const ficheNumber = ref('')
+const searchResults = ref([])
+const isLoading = ref(false)
+const hasSearched = ref(false)
 
-// Usar composable para datos con endpoint dinámico
-const { 
-  data: fiches, 
-  isLoading, 
-  fetchData: fetchFiches 
-} = useApiData('/fiches/listFiche', {
-  extractData: (response) => response?.msg || [],
-  showEmptyInfo: false,
-  errorMessage: 'Error al cargar las fichas'
-})
-
-async function handleFilterFiches(val, update) {
-  searchTerm.value = val || ''
-  
-  if (!val) {
-    update(() => {
-      fiches.value = []
-    })
+// Función flecha para buscar fichas por número
+const searchFiche = async () => {
+  if (!ficheNumber.value || ficheNumber.value.trim() === '') {
+    notifications.warning('Por favor ingresa un número de ficha')
     return
   }
 
-  update(async () => {
-    await fetchFiches(`?number=${val}`)
+  isLoading.value = true
+  hasSearched.value = true
+  
+  try {
+    const response = await getData(`/fiches/listFiche?number=${ficheNumber.value.trim()}`)
+    const fichesData = response?.msg || response?.data || []
+    searchResults.value = Array.isArray(fichesData) ? fichesData : []
+    
+    console.log('� Fichas encontradas:', searchResults.value.length)
+    
+    if (searchResults.value.length === 0) {
+      notifications.info(`No se encontraron fichas con el número: ${ficheNumber.value}`)
+    }
+  } catch (error) {
+    console.error('Error al buscar la ficha:', error)
+    notifications.error('Error al buscar la ficha')
+    searchResults.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Función para seleccionar una ficha y redirigir
+const selectFiche = (fiche) => {
+  router.push({
+    name: 'Apprentices',
+    query: { recordNumber: fiche.number }
   })
 }
-
-function handlePopupShow () {
-  if (!searchTerm.value && selectRef.value && typeof selectRef.value.hidePopup === 'function') {
-    selectRef.value.hidePopup()
-  }
-}
-
-
-watch(selectedFiche, (newValue) => {
-  if (newValue) {
-    // Buscar usando while
-    let selectedFicheObj = null
-    let i = 0
-    while (i < fiches.value.length) {
-      const f = fiches.value[i]
-      if (f._id === newValue || f.number === newValue) {
-        selectedFicheObj = f
-        break
-      }
-      i++
-    }
-    if (selectedFicheObj) {
-      router.push(`/app/admin/aprendices/${selectedFicheObj._id}`)
-    }
-  }
-})
-
-
-onMounted(() => {
-  fetchFiches()
-})
 </script>
 
 <style lang="sass" scoped>
 .container
-  max-width: 800px
+  max-width: 900px
   margin: 0 auto
+
+// Input de búsqueda
+.search-input
+  font-size: 1.1rem
+  
+  :deep(.q-field__control)
+    height: 56px
+    border-radius: 12px
+    
+  :deep(.q-field__label)
+    font-size: 1rem
+    font-weight: 500
+    color: var(--color-text-secondary)
+    
+  :deep(.q-field__native)
+    font-size: 1.1rem
+    padding-top: 4px
+
+.search-btn
+  color: var(--color-primary) !important
+  
+  &:hover
+    background-color: var(--color-bg-hover)
+
+// Card de resultados
+.results-card
+  border-radius: 12px
+  box-shadow: 0 2px 12px var(--shadow-general)
+  overflow: hidden
+  transition: box-shadow 0.3s ease
+  
+  &:hover
+    box-shadow: 0 4px 20px var(--shadow-general-medium)
+
+.results-header
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%)
+  color: white
+  padding: 20px 24px
+  
+  .text-h6
+    font-weight: 600
+    font-size: 1.25rem
+    margin-bottom: 4px
+    
+  .text-caption
+    color: rgba(255, 255, 255, 0.9)
+    font-size: 0.9rem
+
+// Items de resultados
+.result-item
+  padding: 16px 24px
+  border-bottom: 1px solid var(--color-border-light)
+  transition: all 0.25s ease
+  cursor: pointer
+  
+  &:last-child
+    border-bottom: none
+  
+  &:hover
+    background-color: var(--color-bg-hover)
+    padding-left: 28px
+    
+    .q-icon
+      transform: translateX(4px)
+  
+  .q-icon
+    transition: transform 0.25s ease
+
+.fiche-number
+  font-size: 1.1rem
+  font-weight: 600
+  color: var(--color-text-primary)
+  margin-bottom: 4px
+
+.fiche-program
+  font-size: 0.9rem
+  color: var(--color-text-secondary)
+  line-height: 1.4
+
+// Banner sin resultados
+.no-results-banner
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)
+  border: 2px solid var(--color-border-light)
+  border-radius: 12px
+  padding: 24px
+  box-shadow: 0 2px 8px var(--shadow-general)
+  
+  .text-subtitle1
+    color: var(--color-text-primary)
+    
+  .text-body2
+    color: var(--color-text-secondary)
+    
+    strong
+      color: var(--color-primary)
+      font-weight: 600
+
+// Responsive
+@media (max-width: 600px)
+  .container
+    padding: 0 12px
+    
+  .search-input
+    :deep(.q-field__control)
+      height: 52px
+      
+  .results-header
+    padding: 16px 20px
+    
+    .text-h6
+      font-size: 1.1rem
+      
+  .result-item
+    padding: 14px 20px
+    
+  .fiche-number
+    font-size: 1rem
+    
+  .fiche-program
+    font-size: 0.85rem
 </style>

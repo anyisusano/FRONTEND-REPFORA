@@ -15,7 +15,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import MainTable from 'src/components/tables/MainTable.vue'
-import axios from 'axios'
+import { getData } from '../../../services/apiClient'
 import BackButton from 'src/components/BackButton.vue'
 
 //Capturar parámetros del filtro enviados por el componente anterior
@@ -44,16 +44,24 @@ const datos = ref([])
 //Cargar datos desde backend usando los filtros
 const obtenerDatos = async () => {
   try {
-    const response = await axios.get('/api/reportes/instructor', {
-      params: filtros.value
-    })
+    const params = new URLSearchParams()
+    if (filtros.value.instructor) params.append('instructor', filtros.value.instructor)
+    if (filtros.value.programa) params.append('programa', filtros.value.programa)
+    if (filtros.value.ficha) params.append('ficha', filtros.value.ficha)
+    if (filtros.value.trimestre) params.append('trimestre', filtros.value.trimestre)
+    if (filtros.value.estadoInstructor) params.append('estadoInstructor', filtros.value.estadoInstructor)
+    if (filtros.value.fechaInicioPrograma) params.append('fechaInicioPrograma', filtros.value.fechaInicioPrograma)
+    if (filtros.value.fechaFinPrograma) params.append('fechaFinPrograma', filtros.value.fechaFinPrograma)
+    if (filtros.value.jornada) params.append('jornada', filtros.value.jornada)
+    const url = `/reportes/instructor${params.toString() ? `?${params.toString()}` : ''}`
+    const response = await getData(url)
 
     //Backend devuelve algo como:
     // {
     //   fichas: [...]
     // }
 
-    datos.value = response.data.fichas || []
+    datos.value = response.fichas || []
   } catch (error) {
     // TODO: Manejar error
   }

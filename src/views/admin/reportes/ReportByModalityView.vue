@@ -22,7 +22,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import StatsCard from 'src/components/cards/StatsCard.vue'
 import MainTable from 'src/components/tables/MainTable.vue'
-import axios from 'axios'
+import { getData } from '../../../services/apiClient'
 import BackButton from 'src/components/BackButton.vue'
 
 //Capturar parámetros del filtro enviados por el componente anterior
@@ -54,9 +54,13 @@ const datos = ref([])
 //Cargar datos desde backend usando los filtros
 const obtenerDatos = async () => {
   try {
-    const response = await axios.get('/api/reportes/modalidad', {
-      params: filtros.value
-    })
+    const params = new URLSearchParams()
+    if (filtros.value.anio) params.append('anio', filtros.value.anio)
+    if (filtros.value.modalidad) params.append('modalidad', filtros.value.modalidad)
+    if (filtros.value.fechaInicio) params.append('fechaInicio', filtros.value.fechaInicio)
+    if (filtros.value.fechaFin) params.append('fechaFin', filtros.value.fechaFin)
+    const url = `/reportes/modalidad${params.toString() ? `?${params.toString()}` : ''}`
+    const response = await getData(url)
 
     //Backend devuelve algo como:
     // {
@@ -64,13 +68,13 @@ const obtenerDatos = async () => {
     //   resumen: { presencial: 10, virtual: 8, mixta: 5 }
     // }
 
-    datos.value = response.data.fichas || []
+    datos.value = response.fichas || []
 
     // Actualizar cards
-    if (response.data.resumen) {
-      cards.value[0].value = response.data.resumen.presencial || 0
-      cards.value[1].value = response.data.resumen.virtual || 0
-      cards.value[2].value = response.data.resumen.mixta || 0
+    if (response.resumen) {
+      cards.value[0].value = response.resumen.presencial || 0
+      cards.value[1].value = response.resumen.virtual || 0
+      cards.value[2].value = response.resumen.mixta || 0
     }
   } catch (error) {
     // TODO: Manejar error

@@ -269,7 +269,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
-import { apiClient } from '../../services/apiClient'
+import { putData } from '../../services/apiClient'
 import { useNotifications } from '../../composables/useNotifications'
 import { useFormValidation } from '../../composables/useFormValidation'
 // useTableFiltering está deprecado - el filtrado debe hacerse en el backend
@@ -381,7 +381,7 @@ async function updateRegistration() {
   try {
     isSaving.value = true
     const updateData = { admin_observations: itemBeingEdited.value.admin_observations }
-    await apiClient.put(`/registrations/updateRegistration/${itemBeingEdited.value._id}`, updateData)
+    await putData(`/registrations/updateRegistration/${itemBeingEdited.value._id}`, updateData)
     notifications.success('Observación agregada exitosamente')
     editModalRef.value?.closeDialog()
     if (formRef.value) { formRef.value.resetValidation() }
@@ -401,7 +401,7 @@ async function handleValidate(record, newStatus) {
     try {
       isLoading.value = true
       const validationData = { registration_status: newStatus, admin_observations: newStatus === 0 ? 'Documentos completos y verificados' : 'Faltan documentos requeridos' }
-      await apiClient.put(`/registrations/validateRegistration/${record._id}`, validationData)
+      await putData(`/registrations/validateRegistration/${record._id}`, validationData)
       notifications.success(`Registro ${statusText === 'aprobar' ? 'aprobado' : 'rechazado'} exitosamente`)
       await fetchRegistrations()
     } catch (error) {
@@ -420,7 +420,7 @@ async function handleValidate(record, newStatus) {
     try {
       isLoading.value = true
       const validationData = { registration_status: newStatus, admin_observations: newStatus === 0 ? 'Documentos completos y verificados' : 'Faltan documentos requeridos' }
-      await apiClient.put(`/registrations/validateRegistration/${record._id}`, validationData)
+      await putData(`/registrations/validateRegistration/${record._id}`, validationData)
       notifications.success(`Registro ${statusText === 'aprobar' ? 'aprobado' : 'rechazado'} exitosamente`)
       await fetchRegistrations()
     } catch (error) {

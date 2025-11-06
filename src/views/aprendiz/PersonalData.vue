@@ -98,15 +98,21 @@
 
           <div class="datos-instructores">
             <div class="datos-label instructores-title">Instructores Asignados</div>
-            <div class="instructor-card">
-              <div class="instructor-circle"></div>
-              <div class="instructor-nombre"></div>
+            
+            <!-- Mensaje cuando no hay instructores -->
+            <div v-if="!instructores || instructores.length === 0 || (instructores.length === 1 && instructores[0].nombre === 'Cargando...')" class="no-instructores-message">
+              <q-icon name="info" size="32px" color="grey-6" class="q-mb-sm" />
+              <p class="text-grey-7 text-center">No tienes instructores asignados en este momento.</p>
             </div>
-            <div class="instructor-card">
-              <div class="instructor-circle"></div>
-              <div class="instructor-nombre"></div>
-            </div>
-            <boton-enviar label="Contactar" unelevated @click="abrirModalContactar" />
+            
+            <!-- Lista de instructores cuando sí hay -->
+            <template v-else>
+              <div v-for="(instructor, index) in instructores" :key="index" class="instructor-card">
+                <div class="instructor-circle">{{ obtenerIniciales(instructor.nombre) }}</div>
+                <div class="instructor-nombre">{{ instructor.nombre }}</div>
+              </div>
+              <boton-enviar label="Contactar" unelevated @click="abrirModalContactar" />
+            </template>
           </div>
         </div>
       </div>
@@ -304,6 +310,15 @@ const instructores = ref([
   { nombre: 'Cargando...', telefono: '-', correo: '-' }
 ])
 
+function obtenerIniciales(nombre) {
+  if (!nombre || nombre === 'Cargando...') return '?'
+  const palabras = nombre.trim().split(' ')
+  if (palabras.length >= 2) {
+    return (palabras[0][0] + palabras[1][0]).toUpperCase()
+  }
+  return nombre.substring(0, 2).toUpperCase()
+}
+
 function getFichaNumber(user) {
   if (user?.fichaNumber) {
     return user.fichaNumber
@@ -397,7 +412,7 @@ function decodeJWT(token) {
       atob(base64)
         // Convertir cada carácter usando while
         (() => {
-          const chars = jwtBase64.split('')
+          const chars = base64.split('')
           const encoded = []
           let i = 0
           while (i < chars.length) {
@@ -686,13 +701,72 @@ async function cargarDatosCompletos() {
 
 async function cargarInstructores() {
   try {
-    instructores.value = [
-      { nombre: 'Instructor 1', telefono: '123456789', correo: 'instructor1@example.com' },
-      { nombre: 'Instructor 2', telefono: '987654321', correo: 'instructor2@example.com' }
-    ]
+    instructores.value = [{ nombre: 'Cargando...', telefono: '-', correo: '-' }]
+    
+    // Obtener la ficha del usuario
+    const ficheId = usuario.value?.ficheId || usuario.value?.recordNumber?.[0]?.fiche?._id
+    
+    if (!ficheId) {
+      console.log('No se encontró ID de ficha para el aprendiz')
+      instructores.value = []
+      return
+    }
+    
+    // Intentar obtener los instructores de la ficha
+    try {
+      const response = await getData(`/fiches/ficheById/${ficheId}`)
+      const ficheData = response?.data || response?.msg || response
+      
+      // Los instructores pueden estar en diferentes campos
+      const instructoresData = ficheData?.instructors || 
+                               ficheData?.instructor || 
+                               ficheData?.Instructor ||
+                               []
+      
+      if (!instructoresData || (Array.isArray(instructoresData) && instructoresData.length === 0)) {
+        console.log('No se encontraron instructores asignados a la ficha')
+        instructores.value = []
+        return
+      }
+      
+      // Convertir los datos de instructores al formato esperado
+      const instructoresList = Array.isArray(instructoresData) ? instructoresData : [instructoresData]
+      
+      instructores.value = instructoresList.map(inst => ({
+        nombre: inst.name || inst.Name || `${inst.firstName || ''} ${inst.lastName || ''}`.trim() || 'Instructor',
+        telefono: inst.phone || inst.Phone || inst.phoneNumber || '-',
+        correo: inst.email?.institutional || inst.email?.personal || inst.email || inst.Email || '-'
+      }))
+      
+      // Filtrar instructores sin nombre válido
+      instructores.value = instructores.value.filter(inst => inst.nombre && inst.nombre !== 'Instructor')
+      
+      if (instructores.value.length === 0) {
+        console.log('No se encontraron instructores válidos')
+      }
+      
+    } catch (ficheError) {
+      console.log('No se pudo obtener información de la ficha:', ficheError.message)
+      
+      // Intentar buscar directamente en el objeto del usuario
+      if (usuario.value?.instructors || usuario.value?.instructor) {
+        const userInstructors = usuario.value?.instructors || [usuario.value?.instructor]
+        
+        instructores.value = userInstructors.map(inst => ({
+          nombre: inst.name || inst.Name || `${inst.firstName || ''} ${inst.lastName || ''}`.trim() || 'Instructor',
+          telefono: inst.phone || inst.Phone || '-',
+          correo: inst.email?.institutional || inst.email?.personal || inst.email || '-'
+        }))
+        
+        instructores.value = instructores.value.filter(inst => inst.nombre && inst.nombre !== 'Instructor')
+      } else {
+        instructores.value = []
+      }
+    }
+    
   } catch (error) {
     console.error('Error al cargar instructores:', error)
-    notifications.error('No se pudieron cargar los datos de los instructores')
+    instructores.value = []
   }
 }
 
@@ -978,6 +1052,23 @@ onMounted(async () => {
   padding-bottom: 0.8rem;
   border-bottom: 2px solid var(--color-border-primary);
   width: 100%;
+}
+
+.no-instructores-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+  width: 100%;
+  min-height: 150px;
+}
+
+.no-instructores-message p {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .instructor-card {

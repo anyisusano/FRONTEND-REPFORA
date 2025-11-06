@@ -3,25 +3,25 @@
     <BackButton />
     
     <div class="text-center q-mb-lg">
-      <h1 class="text-weight-bold text-black q-my-md" style="font-size: 3rem;">ALERTS</h1>
+      <h1 class="text-weight-bold text-black q-my-md" style="font-size: 3rem;">ALERTAS</h1>
     </div>
 
     <div class="container">
       <!-- Fiche Expiration Alerts Section -->
       <div class="section-title q-mb-md">
-        <h2 class="text-h6">Fiche Expiration Alerts</h2>
+        <h2 class="text-h6">Alertas de Expiración de Fichas</h2>
       </div>
 
       <q-card class="section-card q-mb-lg">
         <div class="section-header">
-          <div class="header-title">Fiche Configuration</div>
+          <div class="header-title">Configuración de Fichas</div>
         </div>
 
         <q-card-section class="section-content">
           <div class="config-row">
             <div class="config-label-group">
-              <div class="config-label">New fiches (post November 2024)</div>
-              <div class="config-sublabel">Time limit without registering productive stage</div>
+              <div class="config-label">Fichas nuevas (posterior a noviembre 2024)</div>
+              <div class="config-sublabel">Tiempo límite sin registrar etapa productiva</div>
             </div>
             <div class="config-input-group">
               <q-select
@@ -31,14 +31,14 @@
                 dense
                 class="custom-select"
               />
-              <span class="input-hint">Month</span>
+              <span class="input-hint">Mes</span>
             </div>
           </div>
 
           <div class="config-row">
             <div class="config-label-group">
-              <div class="config-label">Old fiches (pre November 2024)</div>
-              <div class="config-sublabel">Time limit without registering productive stage</div>
+              <div class="config-label">Fichas antiguas (anterior a noviembre 2024)</div>
+              <div class="config-sublabel">Tiempo límite sin registrar etapa productiva</div>
             </div>
             <div class="config-input-group">
               <q-select
@@ -48,13 +48,13 @@
                 dense
                 class="custom-select"
               />
-              <span class="input-hint">Year</span>
+              <span class="input-hint">Año</span>
             </div>
           </div>
 
           <div class="form-actions">
             <BotonEnviar
-              label="Save Configuration"
+              label="Guardar Configuración"
               @click="handleOpenConfirmation(SECTION_TYPES.FICHE)"
             />
           </div>
@@ -130,7 +130,7 @@
 
           <div class="form-actions">
             <BotonEnviar
-              label="Save Configuration"
+              label="Guardar Configuración"
               @click="handleOpenConfirmation(SECTION_TYPES.ESCALATED)"
             />
           </div>
@@ -139,20 +139,20 @@
 
       <!-- Process Alerts Section -->
       <div class="section-title q-mb-md q-mt-lg">
-        <h2 class="text-h6">Process Alerts</h2>
+        <h2 class="text-h6">Alertas de Proceso</h2>
       </div>
 
       <q-card class="section-card">
         <div class="section-header">
-          <div class="header-title">Alert Configuration</div>
+          <div class="header-title">Configuración de Alertas</div>
         </div>
 
         <q-card-section class="section-content">
           <!-- Pending Log Alert -->
           <div class="process-row q-mb-md">
             <div class="process-label-group">
-              <div class="process-label">Pending logbook alert</div>
-              <div class="process-sublabel">Notify when a logbook is about to expire</div>
+              <div class="process-label">Alerta de bitácora pendiente</div>
+              <div class="process-sublabel">Notificar cuando una bitácora está a punto de vencer</div>
             </div>
             <div class="process-input-group">
               <q-select
@@ -162,7 +162,7 @@
                 dense
                 class="process-select"
               />
-              <span class="process-hint">days before</span>
+              <span class="process-hint">días antes</span>
               <q-toggle
                 v-model="formData.pendingLogAlertEnabled"
                 color="green"
@@ -173,8 +173,8 @@
           <!-- Pending Follow-up Alert -->
           <div class="process-row q-mb-md">
             <div class="process-label-group">
-              <div class="process-label">Pending follow-up alert</div>
-              <div class="process-sublabel">Notify when a follow-up is about to expire</div>
+              <div class="process-label">Alerta de seguimiento pendiente</div>
+              <div class="process-sublabel">Notificar cuando un seguimiento está a punto de vencer</div>
             </div>
             <div class="process-input-group">
               <q-select
@@ -184,7 +184,7 @@
                 dense
                 class="process-select"
               />
-              <span class="process-hint">days before</span>
+              <span class="process-hint">días antes</span>
               <q-toggle
                 v-model="formData.pendingFollowUpAlertEnabled"
                 color="green"
@@ -195,8 +195,8 @@
           <!-- Critical Follow-up Alert -->
           <div class="process-row q-mb-md">
             <div class="process-label-group">
-              <div class="process-label">Critical last follow-up alert</div>
-              <div class="process-sublabel">Critical notification for the last scheduled follow-up</div>
+              <div class="process-label">Alerta crítica de último seguimiento</div>
+              <div class="process-sublabel">Notificación crítica para el último seguimiento programado</div>
             </div>
             <div class="process-input-group">
               <q-select
@@ -206,7 +206,7 @@
                 dense
                 class="process-select"
               />
-              <span class="process-hint">days before</span>
+              <span class="process-hint">días antes</span>
               <q-toggle
                 v-model="formData.criticalFollowUpAlertEnabled"
                 color="green"
@@ -217,8 +217,8 @@
           <!-- Instructor Review Time -->
           <div class="process-row q-mb-md">
             <div class="process-label-group">
-              <div class="process-label">Instructor review time</div>
-              <div class="process-sublabel">Time limit and alert for instructor reviews</div>
+              <div class="process-label">Tiempo de revisión del instructor</div>
+              <div class="process-sublabel">Límite de tiempo y alerta para revisiones del instructor</div>
             </div>
             <div class="process-input-group">
               <q-select
@@ -228,7 +228,7 @@
                 dense
                 class="process-select"
               />
-              <span class="process-hint">days before</span>
+              <span class="process-hint">días antes</span>
               <q-toggle
                 v-model="formData.instructorReviewTimeEnabled"
                 color="green"
@@ -238,7 +238,7 @@
 
           <div class="form-actions">
             <BotonEnviar
-              label="Save Configuration"
+              label="Guardar Configuración"
               @click="handleOpenConfirmation(SECTION_TYPES.PROCESS)"
             />
           </div>
@@ -254,7 +254,7 @@
     >
       <template #header>
         <div class="modal-header-content">
-          <div class="text-h6">Are you sure you want to save the changes?</div>
+          <div class="text-h6">¿Está seguro de que desea guardar los cambios?</div>
           <q-btn
             flat
             round
@@ -276,9 +276,9 @@
 
       <template #footer>
         <div class="modal-footer-buttons">
-          <BotonCerrar label="Cancel" @click="handleCloseConfirmation" />
+          <BotonCerrar label="Cancelar" @click="handleCloseConfirmation" />
           <BotonEnviar
-            label="Accept"
+            label="Aceptar"
             @click="handleSaveConfiguration"
             :loading="isSaving"
           />

@@ -18,7 +18,7 @@
   title="Vista de Documentos" 
   subtitle="Consulta y Visualización" 
   imgSrc="/src/assets/Almacenamiento.jpg"
-  route="admin/buscar-ficha" 
+  route="/app/admin/fichas" 
   color="var(--color-primary)"
   textColor="white" />
 

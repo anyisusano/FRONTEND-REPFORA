@@ -255,7 +255,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { apiClient } from '../../services/apiClient'
+import { getData } from '../../services/apiClient'
 import { useNotifications } from '../../composables/useNotifications'
 import { useTableFiltering } from '../../composables/useTableFiltering'
 import { STATUS } from '../../constants'
@@ -389,8 +389,8 @@ async function fetchInstructors() {
   error.value = null
 
   try {
-    const response = await apiClient.get('/instructors/listInstructor')
-    const msg = response.data?.msg
+    const response = await getData('/instructors/listInstructor')
+    const msg = response?.msg
 
     const instructorsArray = Array.isArray(msg)
       ? msg
