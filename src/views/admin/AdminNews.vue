@@ -103,94 +103,101 @@
       max-width="98vw"
     >
       <template #header>
-        <div class="text-h6">Detalles de la Novedad</div>
+        <div class="modal-header-title">Detalles de la Novedad</div>
       </template>
 
       <template #body>
-        <div v-if="selectedNews" class="row q-col-gutter-lg">
-          <div class="col-12 col-md-6">
-            <div class="text-h6 q-mb-md section-title">Información del Aprendiz</div>
-            <div class="data-grid">
-              <div class="data-row">
-                <div class="text-weight-bold">Nombre:</div>
-                <div class="data-value">{{ selectedNews.name || '-' }}</div>
-              </div>
-              <div class="data-row">
-                <div class="text-weight-bold">Documento:</div>
-                <div class="data-value">{{ selectedNews.tpdocument ? `${selectedNews.tpdocument} ${selectedNews.document || ''}`.trim() : (selectedNews.document || '-') }}</div>
-              </div>
-              <div class="data-row">
-                <div class="text-weight-bold">Ficha:</div>
-                <div class="data-value">{{ selectedNews.fiche?.number || selectedNews.code || '-' }}</div>
-              </div>
-              <div class="data-row">
-                <div class="text-weight-bold">Programa:</div>
-                <div class="data-value">{{ selectedNews.fiche?.program?.name || selectedNews.fiche?.program?.code || selectedNews.coordination?.name || '-' }}</div>
-              </div>
-            </div>
-
-            <div class="text-h6 q-mb-md section-title q-mt-lg">Descripción de la Novedad</div>
-            <div class="data-grid">
-              <div class="data-row">
-                <div class="text-weight-bold">Tipo:</div>
-                <div class="data-value">{{ selectedNews.tpnew || '-' }}</div>
-              </div>
-              <div class="data-row">
-                <div class="text-weight-bold">Subtipo:</div>
-                <div class="data-value">{{ selectedNews.subtype || selectedNews.typetransfer || '-' }}</div>
-              </div>
-              <div class="data-row">
-                <div class="text-weight-bold">Causa:</div>
-                <div class="data-value">{{ selectedNews.cause || selectedNews.description || selectedNews.descripcion || 'Sin descripción' }}</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6">
-            <div class="text-h6 q-mb-md section-title">Estado y Seguimiento</div>
-            <div class="data-grid">
-              <div class="data-row">
-                <div class="text-weight-bold">Estado:</div>
-                <div class="data-value">{{ selectedNews.state || (selectedNews.status !== undefined ? String(selectedNews.status) : '-') }}</div>
-              </div>
-              <div class="data-row">
-                <div class="text-weight-bold">Procesado:</div>
-                <div class="data-value">{{ selectedNews.processed ? 'Sí' : 'No' }}</div>
-              </div>
-              <div class="data-row">
-                <div class="text-weight-bold">Instructor:</div>
-                <div class="data-value">
-                  <!-- Cambiado: mostrar fiche.owner.name > owner.name > instructor existente -->
-                  <template v-if="selectedNews.fiche?.owner?.name">
-                    {{ selectedNews.fiche.owner.name }}
-                  </template>
-                  <template v-else-if="selectedNews.owner?.name">
-                    {{ selectedNews.owner.name }}
-                  </template>
-                  <template v-else-if="selectedNews.instructor">
-                    <template v-if="typeof selectedNews.instructor === 'object'">
-                      {{ selectedNews.instructor.name || selectedNews.instructor.Name || selectedNews.instructor._id || '-' }}
-                    </template>
-                    <template v-else>
-                      {{ instructorMap[String(selectedNews.instructor)] || selectedNews.instructor }}
-                    </template>
-                  </template>
-                  <template v-else>-</template>
+        <div v-if="selectedNews" class="modal-content">
+          <div class="row q-col-gutter-lg">
+            <div class="col-12 col-md-6">
+              <div class="info-section">
+                <div class="section-header">Información del Aprendiz</div>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">Nombre:</span>
+                    <span class="info-value">{{ selectedNews.name || '-' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Documento:</span>
+                    <span class="info-value">{{ selectedNews.tpdocument ? `${selectedNews.tpdocument} ${selectedNews.document || ''}`.trim() : (selectedNews.document || '-') }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Ficha:</span>
+                    <span class="info-value">{{ selectedNews.fiche?.number || selectedNews.code || '-' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Programa:</span>
+                    <span class="info-value">{{ selectedNews.fiche?.program?.name || selectedNews.fiche?.program?.code || selectedNews.coordination?.name || '-' }}</span>
+                  </div>
                 </div>
               </div>
-              <div class="data-row">
-                <div class="text-weight-bold">Tiempo transcurrido:</div>
-                <div class="data-value">{{ getElapsedTime(selectedNews.createdAt || selectedNews.datesofia) }}</div>
+
+              <div class="info-section q-mt-md">
+                <div class="section-header">Descripción de la Novedad</div>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">Tipo:</span>
+                    <span class="info-value">{{ selectedNews.tpnew || '-' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Subtipo:</span>
+                    <span class="info-value">{{ selectedNews.subtype || selectedNews.typetransfer || '-' }}</span>
+                  </div>
+                  <div class="info-item full-width">
+                    <span class="info-label">Causa:</span>
+                    <span class="info-value">{{ selectedNews.cause || selectedNews.description || selectedNews.descripcion || 'Sin descripción' }}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div v-if="selectedNews.respuestas?.length" class="text-h6 q-mb-md section-title q-mt-lg">
-              Respuestas
-            </div>
-            <div v-if="selectedNews.respuestas?.length" class="data-grid">
-              <div v-for="(respuesta, idx) in selectedNews.respuestas" :key="idx" class="data-row">
-                <div class="text-weight-bold">Respuesta {{ idx + 1 }}:</div>
-                <div class="data-value">{{ respuesta }}</div>
+            <div class="col-12 col-md-6">
+              <div class="info-section">
+                <div class="section-header">Estado y Seguimiento</div>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">Estado:</span>
+                    <span class="info-value">{{ selectedNews.state || (selectedNews.status !== undefined ? String(selectedNews.status) : '-') }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Procesado:</span>
+                    <span class="info-value">{{ selectedNews.processed ? 'Sí' : 'No' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Instructor:</span>
+                    <span class="info-value">
+                      <template v-if="selectedNews.fiche?.owner?.name">
+                        {{ selectedNews.fiche.owner.name }}
+                      </template>
+                      <template v-else-if="selectedNews.owner?.name">
+                        {{ selectedNews.owner.name }}
+                      </template>
+                      <template v-else-if="selectedNews.instructor">
+                        <template v-if="typeof selectedNews.instructor === 'object'">
+                          {{ selectedNews.instructor.name || selectedNews.instructor.Name || selectedNews.instructor._id || '-' }}
+                        </template>
+                        <template v-else>
+                          {{ instructorMap[String(selectedNews.instructor)] || selectedNews.instructor }}
+                        </template>
+                      </template>
+                      <template v-else>-</template>
+                    </span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Tiempo transcurrido:</span>
+                    <span class="info-value">{{ getElapsedTime(selectedNews.createdAt || selectedNews.datesofia) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="selectedNews.respuestas?.length" class="info-section q-mt-md">
+                <div class="section-header">Respuestas</div>
+                <div class="info-grid">
+                  <div v-for="(respuesta, idx) in selectedNews.respuestas" :key="idx" class="info-item full-width">
+                    <span class="info-label">Respuesta {{ idx + 1 }}:</span>
+                    <span class="info-value">{{ respuesta }}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -650,6 +657,53 @@ Styles Adminnews
   color: #34495e
   font-size: 0.95rem
 
+// Estilos del Modal (mismo estilo que Companies.vue)
+.modal-header-title
+  font-size: 1.5rem
+  font-weight: 600
+  color: var(--color-primary)
+
+.modal-content
+  padding: 8px
+
+.info-section
+  background: #f8f9fa
+  border-radius: 8px
+  padding: 20px
+  border: 1px solid #e0e0e0
+
+.section-header
+  font-size: 1.1rem
+  font-weight: 600
+  color: var(--color-primary)
+  margin-bottom: 16px
+  padding-bottom: 8px
+  border-bottom: 2px solid var(--color-primary)
+
+.info-grid
+  display: flex
+  flex-direction: column
+  gap: 12px
+
+.info-item
+  display: grid
+  grid-template-columns: 140px 1fr
+  gap: 12px
+  align-items: start
+  padding: 8px 0
+
+  &.full-width
+    grid-template-columns: 140px 1fr
+
+.info-label
+  font-weight: 600
+  color: #2c3e50
+  font-size: 0.9rem
+
+.info-value
+  color: #34495e
+  font-size: 0.9rem
+  word-break: break-word
 
 @media (max-width: 900px)
   .urgent-cards-grid
