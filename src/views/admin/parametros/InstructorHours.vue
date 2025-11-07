@@ -3,7 +3,7 @@
     <BackButton />
     
     <div class="text-center q-mb-lg">
-      <h1 class="text-weight-bold text-black q-my-md" style="font-size: 3rem;">HORAS DE INSTRUCTOR</h1>
+      <h1 class="text-weight-bold text-black q-my-md" style="font-size: 3rem;">ACADEMICO</h1>
     </div>
 
     <div class="container">
@@ -129,10 +129,10 @@ const confirmationModalRef = ref(null)
 
 // Table Columns
 const columns = [
-  { name: 'name', align: 'center', label: 'Activity', field: 'name', sortable: true },
-  { name: 'value', align: 'center', label: 'Base Hour', field: 'value', sortable: true },
-  { name: 'description', align: 'center', label: 'Description', field: 'description', sortable: true },
-  { name: 'options', align: 'center', label: 'Options', field: 'options' }
+  { name: 'name', align: 'center', label: 'Actividad', field: 'name', sortable: true },
+  { name: 'value', align: 'center', label: 'Hora Base', field: 'value', sortable: true },
+  { name: 'description', align: 'center', label: 'Descripción', field: 'description', sortable: true },
+  { name: 'options', align: 'center', label: 'Opciones', field: 'options' }
 ]
 
 // Computed

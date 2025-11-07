@@ -31,7 +31,7 @@ import MenuCard from '../../components/cards/MenuCard.vue'
 // State
 const parameterCards = ref([
   {
-    title: 'HORAS INSTRUCTORES',
+    title: 'ACADEMICO',
     subtitle: 'Consulta, Registro y Visualización de horas',
     imgSrc: '/src/assets/Horas_Instructor.jpg',
     route: '/app/admin/horasintructores',
@@ -79,8 +79,8 @@ const parameterCards = ref([
     textColor: 'white'
   },
   {
-    title: 'PLANTILLAS',
-    subtitle: 'Consulta de Plantillas',
+    title: 'BITACORAS',
+    subtitle: 'Consulta de Bitácoras',
     imgSrc: '/src/assets/Plantillas_Negro.jpg',
     route: '/app/admin/plantillas',
     color: 'var(--color-primary)',

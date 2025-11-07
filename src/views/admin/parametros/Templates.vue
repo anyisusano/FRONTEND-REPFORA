@@ -3,99 +3,240 @@
     <BackButton />
     
     <div class="text-center q-mb-lg">
-      <h1 class="text-weight-bold text-black q-my-md" style="font-size: 3rem;">PLANTILLAS</h1>
+      <h1 class="text-weight-bold text-black q-my-md" style="font-size: 3rem;">BITACORAS</h1>
     </div>
 
     <div class="container">
-      <q-card class="templates-card">
-        <div class="card-header">
-          <q-icon name="description" size="32px" color="grey-7" />
-        </div>
-        
-        <q-separator />
-        
-        <q-card-section class="templates-list">
-          <div
-            v-for="template in templates"
-            :key="template.id"
-            class="template-item"
-          >
-            <span class="template-name">{{ template.name }}</span>
-            <q-icon
-              name="circle"
-              size="12px"
-              :color="template.active ? 'positive' : 'grey-4'"
-            />
-          </div>
-        </q-card-section>
-      </q-card>
+      <maintable
+        :datos="parameters"
+        :columnas="columns"
+        row-key="_id"
+        no-data-label="No hay parámetros registrados"
+        :rows-per-page-options="[10, 20, 50]"
+        :initial-rows-per-page="10"
+      >
+        <template #body-cell-options="props">
+          <q-td :props="props" class="text-center">
+            <q-btn
+              flat
+              round
+              color="primary"
+              icon="edit"
+              @click="handleEdit(props.row)"
+            >
+              <q-tooltip>Editar</q-tooltip>
+            </q-btn>
+          </q-td>
+        </template>
+      </maintable>
     </div>
+
+    <!-- Edit Modal -->
+    <modalComponent
+      ref="editModalRef"
+      width="600px"
+      max-width="95vw"
+    >
+      <template #header>
+        <div class="text-h6">Editar Cantidad de Bitácoras</div>
+      </template>
+
+      <template #body>
+        <div class="q-pa-md">
+          <div class="text-h6 q-mb-md">{{ editingParameter?.name || '-' }}</div>
+          <q-input
+            v-model="editingValue"
+            outlined
+            dense
+            label="Cantidad de Bitácoras"
+            type="number"
+            :rules="[
+              validation.requiredRule,
+              val => val > 0 || 'La cantidad de bitácoras debe ser mayor que 0'
+            ]"
+          />
+        </div>
+      </template>
+
+      <template #footer>
+        <BotonCerrar label="Cancelar" @click="handleCloseEdit" />
+        <BotonEnviar
+          label="Guardar"
+          @click="handleOpenConfirmation"
+          :disable="!isEditingValueValid"
+        />
+      </template>
+    </modalComponent>
+
+    <!-- Confirmation Modal -->
+    <modalComponent
+      ref="confirmationModalRef"
+      width="500px"
+      max-width="90vw"
+    >
+      <template #header>
+        <div class="text-h6">Confirmar Cambios</div>
+      </template>
+
+      <template #body>
+        <div class="q-pa-md">
+          <p class="confirmation-text">
+            ¿Está seguro de que desea guardar los cambios para <strong>{{ editingParameter?.name }}</strong>?
+          </p>
+          <p class="confirmation-text">
+            El nuevo valor será: <strong>{{ editingValue }}</strong>
+          </p>
+        </div>
+      </template>
+
+      <template #footer>
+        <BotonCerrar label="Cancelar" @click="handleCloseConfirmation" />
+        <BotonEnviar
+          label="Guardar"
+          @click="handleConfirm"
+          :loading="isSaving"
+        />
+      </template>
+    </modalComponent>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { getData, putData } from '../../../services/apiClient'
+import { useNotifications } from '../../../composables/useNotifications'
+import { useFormValidation } from '../../../composables/useFormValidation'
 import BackButton from '../../../components/BackButton.vue'
+import BotonCerrar from '../../../components/BotonCerrar.vue'
+import BotonEnviar from '../../../components/BotonEnviar.vue'
+import maintable from '../../../components/tables/maintable.vue'
+import modalComponent from '../../../components/modals/modalComponent.vue'
+
+// Composables
+const notifications = useNotifications()
+const validation = useFormValidation()
 
 // State
-const templates = ref([
-  { id: 1, name: 'BITACORA', active: true },
-  { id: 2, name: 'SEGUIMIENTO', active: true }
-])
+const isLoading = ref(false)
+const isSaving = ref(false)
+const parameters = ref([])
+const editingParameter = ref(null)
+const editingValue = ref('')
+
+// Modals
+const editModalRef = ref(null)
+const confirmationModalRef = ref(null)
+
+// Table Columns
+const columns = [
+  { name: 'name', align: 'center', label: 'Tipo de Bitácora', field: 'name', sortable: true },
+  { name: 'value', align: 'center', label: 'Cantidad', field: 'value', sortable: true },
+  { name: 'description', align: 'center', label: 'Descripción', field: 'description', sortable: true },
+  { name: 'options', align: 'center', label: 'Opciones', field: 'options' }
+]
+
+// Computed
+const isEditingValueValid = computed(() => {
+  return editingValue.value && editingValue.value > 0
+})
+
+// API Functions
+async function fetchParameters() {
+  isLoading.value = true
+  try {
+    const response = await getData('/parameters/filterParameters?category=LOGBOOK')
+    parameters.value = response?.data || []
+    
+  } catch (error) {
+    console.error('Error loading parameters:', error)
+    const errorMsg = error.response?.data?.message 
+      || error.response?.data?.msg 
+      || error.message 
+      || 'Error loading parameters'
+    notifications.error(errorMsg)
+    parameters.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function updateParameter() {
+  if (!editingParameter.value || !editingValue.value) {
+    notifications.error('Please verify the data')
+    return
+  }
+
+  isSaving.value = true
+
+  try {
+    const id = editingParameter.value._id
+    await putData(`/parameters/updateParameter/${id}`, {
+      value: Number(editingValue.value)
+    })
+
+    notifications.success('Parameter updated successfully')
+    handleCloseConfirmation()
+    setTimeout(() => handleCloseEdit(), 300)
+    await fetchParameters()
+  } catch (error) {
+    console.error('Error updating parameter:', error)
+    const errorMsg = error.response?.data?.message 
+      || error.response?.data?.msg 
+      || error.message 
+      || 'Error updating parameter'
+    notifications.error(errorMsg)
+  } finally {
+    isSaving.value = false
+  }
+}
+
+// Event Handlers
+function handleEdit(parameter) {
+  editingParameter.value = parameter
+  editingValue.value = parameter.value || ''
+  editModalRef.value?.openDialog()
+}
+
+function handleCloseEdit() {
+  editModalRef.value?.closeDialog()
+  editingParameter.value = null
+  editingValue.value = ''
+}
+
+function handleOpenConfirmation() {
+  if (isEditingValueValid.value) {
+    confirmationModalRef.value?.openDialog()
+  } else {
+    notifications.error('Please enter a valid value')
+  }
+}
+
+function handleCloseConfirmation() {
+  confirmationModalRef.value?.closeDialog()
+}
+
+async function handleConfirm() {
+  await updateParameter()
+}
+
+// Lifecycle
+onMounted(() => {
+  fetchParameters()
+})
 </script>
 
 <style lang="sass" scoped>
 .container
-  max-width: 1200px
+  max-width: 1400px
   margin: 0 auto
-  display: flex
-  justify-content: center
-  margin-top: 30px
 
-.templates-card
-  background: #fff
-  border-radius: 14px
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1)
-  width: 95%
-  max-width: 1200px
-  overflow: hidden
-
-.card-header
-  background-color: #fff
-  padding: 20px 25px
-  display: flex
-  align-items: center
-
-.templates-list
-  padding: 0
-
-.template-item
-  display: flex
-  justify-content: space-between
-  align-items: center
-  padding: 18px 25px
-  border-bottom: 1px solid #f0f0f0
-  transition: background-color 0.2s ease
-
-.template-item:last-child
-  border-bottom: none
-
-.template-item:hover
-  background-color: #f9f9f9
-
-.template-name
+.confirmation-text
   font-size: 16px
-  color: #666
-  font-weight: 500
-  letter-spacing: 0.5px
+  margin-bottom: 15px
+  line-height: 1.5
+  color: #333
 
-@media (max-width: 768px)
-  .templates-card
-    width: 100%
-
-  .template-item
-    padding: 15px 20px
-
-  .template-name
-    font-size: 14px
+@media (max-width: 900px)
+  .container
+    padding: 0 10px
 </style>
