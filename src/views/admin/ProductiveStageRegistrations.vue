@@ -433,6 +433,275 @@ onMounted(async () => { await fetchRegistrations() })
 </script>
 
 <style scoped>
-.container { max-width: 1600px; margin: 0 auto; }
-.q-table__card { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.container { 
+  max-width: 1600px; 
+  margin: 0 auto; 
+}
+
+.q-table__card { 
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+}
+
+/* ========== ESTILOS ESTANDARIZADOS PARA MODALES ========== */
+
+/* Estilos base para modales */
+:deep(.q-dialog__inner > .q-card) {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+:deep(.q-card__section--vert) {
+  padding: 0;
+}
+
+/* Headers de modales con gradiente verde */
+:deep(.q-dialog .q-card > .q-card__section:first-child) {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%);
+  padding: 20px 24px;
+  border-radius: 12px 12px 0 0;
+}
+
+:deep(.q-dialog .text-h6) {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Modal Body */
+:deep(.q-dialog .q-card__section:not(:first-child):not(:last-child)) {
+  padding: 24px 28px;
+  background: white;
+}
+
+/* Modal Footer */
+:deep(.q-dialog .q-card__section:last-child) {
+  background: #F8F9FA;
+  border-radius: 0 0 12px 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #E0E0E0;
+}
+
+/* Subtítulos en detalles */
+.text-subtitle2 {
+  font-weight: 600;
+  color: #2C3E50;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.text-body1 {
+  color: #34495e;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+  border-radius: 6px;
+  border: 1px solid #E0E0E0;
+}
+
+.text-weight-bold {
+  font-weight: 600;
+  color: #2C3E50;
+}
+
+/* Banners informativos */
+:deep(.q-banner) {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #E3F2FD;
+}
+
+/* Timeline */
+:deep(.q-timeline) {
+  padding: 16px 0;
+}
+
+:deep(.q-timeline__entry) {
+  padding-bottom: 20px;
+}
+
+:deep(.q-timeline__title) {
+  font-weight: 600;
+  color: #2C3E50;
+  font-size: 0.9rem;
+}
+
+:deep(.q-timeline__subtitle) {
+  color: #7F8C8D;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+:deep(.q-timeline__content) {
+  background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 3px solid var(--color-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-top: 8px;
+}
+
+/* Inputs en modales */
+:deep(.q-field--outlined .q-field__control) {
+  border-radius: 8px;
+  border: 1px solid #E0E0E0;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+:deep(.q-field--outlined.q-field--focused .q-field__control) {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+:deep(.q-field--outlined .q-field__control:hover) {
+  border-color: var(--color-primary);
+}
+
+:deep(.q-field--outlined .q-field__control:before) {
+  border: none;
+}
+
+/* Badges */
+:deep(.q-badge) {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* Botones */
+:deep(.q-btn.boton-cerrar),
+:deep(.q-btn.boton-enviar) {
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+:deep(.q-btn.boton-cerrar:hover),
+:deep(.q-btn.boton-enviar:hover) {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+:deep(.q-btn.boton-enviar) {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%);
+}
+
+:deep(.q-btn.boton-enviar:hover) {
+  background: linear-gradient(135deg, var(--color-primary-hover-dark) 0%, var(--color-primary) 100%);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  :deep(.q-dialog .q-card > .q-card__section:first-child) {
+    padding: 18px 20px;
+  }
+
+  :deep(.q-dialog .text-h6) {
+    font-size: 16px;
+  }
+
+  :deep(.q-dialog .q-card__section:not(:first-child):not(:last-child)) {
+    padding: 20px 24px;
+  }
+
+  :deep(.q-dialog .q-card__section:last-child) {
+    padding: 18px 20px;
+  }
+
+  .text-subtitle2 {
+    font-size: 0.8rem;
+  }
+
+  .text-body1 {
+    font-size: 0.95rem;
+    padding: 6px 10px;
+  }
+
+  :deep(.q-timeline__content) {
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  :deep(.q-dialog .q-card > .q-card__section:first-child) {
+    padding: 16px 18px;
+  }
+
+  :deep(.q-dialog .text-h6) {
+    font-size: 15px;
+  }
+
+  :deep(.q-dialog .q-card__section:not(:first-child):not(:last-child)) {
+    padding: 16px 20px;
+  }
+
+  :deep(.q-dialog .q-card__section:last-child) {
+    padding: 16px 18px;
+  }
+
+  .text-subtitle2 {
+    font-size: 0.75rem;
+  }
+
+  .text-body1 {
+    font-size: 0.9rem;
+    padding: 6px 8px;
+  }
+
+  :deep(.q-btn.boton-cerrar),
+  :deep(.q-btn.boton-enviar) {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+
+  :deep(.q-timeline__title) {
+    font-size: 0.85rem;
+  }
+
+  :deep(.q-timeline__subtitle) {
+    font-size: 0.8rem;
+  }
+
+  :deep(.q-timeline__content) {
+    padding: 10px 12px;
+  }
+}
+
+/* Ajustes específicos para modales grandes */
+@media (min-width: 769px) {
+  :deep(.q-dialog__inner) {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  :deep(.q-dialog__inner) {
+    padding: 16px;
+  }
+
+  :deep(.q-card) {
+    margin: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  :deep(.q-dialog__inner) {
+    padding: 12px;
+  }
+
+  :deep(.q-card) {
+    width: 98vw !important;
+    max-width: 98vw !important;
+    margin: 0 !important;
+  }
+}
 </style>
