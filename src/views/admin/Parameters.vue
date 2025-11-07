@@ -38,14 +38,7 @@ const parameterCards = ref([
     color: 'var(--color-primary)',
     textColor: 'white'
   },
-  {
-    title: 'PROCESO FORMATIVO',
-    subtitle: 'Consulta y Visualización',
-    imgSrc: '/src/assets/Proceso_Formativo.jpg',
-    route: '/app/admin/procesoformativo',
-    color: 'var(--color-primary)',
-    textColor: 'white'
-  },
+ 
   {
     title: 'ALERTAS',
     subtitle: 'Consulta Alertas',
@@ -70,14 +63,7 @@ const parameterCards = ref([
     color: 'var(--color-primary)',
     textColor: 'white'
   },
-  {
-    title: 'CORREOS',
-    subtitle: 'Consulta y Envío de Correos',
-    imgSrc: '/src/assets/SubirDocumentos_negro.jpg',
-    route: '/app/admin/correos',
-    color: 'var(--color-primary)',
-    textColor: 'white'
-  },
+
   {
     title: 'BITACORAS',
     subtitle: 'Consulta de Bitácoras',

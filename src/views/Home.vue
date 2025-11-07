@@ -13,14 +13,7 @@
           textColor="white" />
 
 
-          <Card
-  v-if="role === 'ETAPA PRODUCTIVA VIRTUAL' || role === 'ETAPA PRODUCTIVA PRESENCIAL'"
-  title="Vista de Documentos" 
-  subtitle="Consulta y Visualización" 
-  imgSrc="/src/assets/Almacenamiento.jpg"
-  route="/app/admin/fichas" 
-  color="var(--color-primary)"
-  textColor="white" />
+  
 
         <Card
           v-if="role === 'ETAPA PRODUCTIVA VIRTUAL' || role === 'ETAPA PRODUCTIVA PRESENCIAL'"
@@ -32,7 +25,7 @@
           textColor="white" />
         <Card
           v-if="role === 'ETAPA PRODUCTIVA VIRTUAL' || role === 'ETAPA PRODUCTIVA PRESENCIAL'"
-          title="Aprendices" 
+          title="Aprendices y Documentos" 
           subtitle="Consulta y Visualización" 
           imgSrc="/src/assets/pyme.jpg" 
           route="/app/admin/fichas"

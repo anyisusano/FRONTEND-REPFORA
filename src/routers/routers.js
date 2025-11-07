@@ -18,15 +18,12 @@ import AdminNews from '../views/admin/AdminNews.vue'
 import ProductiveStageModalities from '../views/admin/ProductiveStageModalities.vue'
 import ProductiveStageRegistrations from '../views/admin/ProductiveStageRegistrations.vue'
 import SearchGroup from '../views/admin/SearchGroup.vue'
-import DocumentsView from '../views/admin/DocumentsView.vue'
 import ApprenticeDocumentsDetail from '../views/admin/ApprenticeDocumentsDetail.vue'
 
 // Admin parameters
 import Alerts from '../views/admin/parametros/Alerts.vue'
-import Emails from '../views/admin/parametros/Emails.vue'
 import Storage from '../views/admin/parametros/Storage.vue'
 import InstructorHours from '../views/admin/parametros/InstructorHours.vue'
-import TrainingProcess from '../views/admin/parametros/TrainingProcess.vue'
 import Security from '../views/admin/parametros/Security.vue'
 import Templates from '../views/admin/parametros/Templates.vue'
 
@@ -105,13 +102,10 @@ const routes = [
       { path: 'admin/modalidadesEP', name: 'ProductiveStageModalities', component: ProductiveStageModalities },
       { path: 'admin/registrosEP', name: 'ProductiveStageRegistrations', component: ProductiveStageRegistrations },
       { path: 'admin/buscar-ficha', name: 'SearchGroup', component: SearchGroup },
-      { path: 'admin/documentos/:ficha', name: 'DocumentsView', component: DocumentsView },
       { path: 'admin/documentos/:ficha/aprendiz/:aprendizId', name: 'ApprenticeDocumentsDetail', component: ApprenticeDocumentsDetail },
       { path: 'admin/alertas', name: 'Alerts', component: Alerts },
       { path: 'admin/almacenamiento', name: 'Storage', component: Storage },
-      { path: 'admin/correos', name: 'Emails', component: Emails },
       { path: 'admin/horasintructores', name: 'InstructorHours', component: InstructorHours },
-      { path: 'admin/procesoformativo', name: 'TrainingProcess', component: TrainingProcess },
       { path: 'admin/seguridad', name: 'Security', component: Security },
       { path: 'admin/plantillas', name: 'Templates', component: Templates },
       { path: 'admin/horasporinstructor', name: 'HoursByInstructor', component: HoursByInstructor },

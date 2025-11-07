@@ -1,4 +1,6 @@
-﻿<template>
+﻿
+
+<template>
   <div class="q-pa-md">
     <BackButton />
     
@@ -7,11 +9,6 @@
     </div>
 
     <div class="container">
-      <!-- Fiche Expiration Alerts Section -->
-      <div class="section-title q-mb-md">
-        <h2 class="text-h6">Alertas de Expiración de Fichas</h2>
-      </div>
-
       <q-card class="section-card q-mb-lg">
         <div class="section-header">
           <div class="header-title">Configuración de Fichas</div>
@@ -24,9 +21,9 @@
               <div class="config-sublabel">Tiempo límite sin registrar etapa productiva</div>
             </div>
             <div class="config-input-group">
-              <q-select
+              <q-input
                 v-model="formData.newRecordsTime"
-                :options="monthOptions"
+                type="number"
                 outlined
                 dense
                 class="custom-select"
@@ -41,14 +38,50 @@
               <div class="config-sublabel">Tiempo límite sin registrar etapa productiva</div>
             </div>
             <div class="config-input-group">
-              <q-select
+              <q-input
                 v-model="formData.oldRecordsTime"
-                :options="yearOptions"
+                type="number"
                 outlined
                 dense
                 class="custom-select"
               />
               <span class="input-hint">Año</span>
+            </div>
+          </div>
+
+          <div class="config-row">
+            <div class="config-label-group">
+              <div class="config-label">Máximo de registros por aprendiz/ficha</div>
+              <div class="config-sublabel">Número máximo de registros permitidos por aprendiz en una ficha</div>
+            </div>
+            <div class="config-input-group">
+              <q-input
+                v-model="formData.maxRecordsPerApprentice"
+                type="number"
+                outlined
+                dense
+                class="custom-select"
+                min="1"
+              />
+              <span class="input-hint">Registros</span>
+            </div>
+          </div>
+
+          <div class="config-row">
+            <div class="config-label-group">
+              <div class="config-label">Horas mensuales instructores</div>
+              <div class="config-sublabel">Límite de horas mensuales asignables por instructor</div>
+            </div>
+            <div class="config-input-group">
+              <q-input
+                v-model="formData.monthlyInstructorHours"
+                type="number"
+                outlined
+                dense
+                class="custom-select"
+                min="0"
+              />
+              <span class="input-hint">Horas</span>
             </div>
           </div>
 
@@ -61,19 +94,17 @@
         </q-card-section>
       </q-card>
 
-      <!-- Escalated Alerts Section -->
       <q-card class="section-card q-mb-lg">
         <div class="section-header">
-          <div class="header-title">Escalated Alerts</div>
+          <div class="header-title">Alertas Escalonadas</div>
         </div>
 
         <q-card-section class="section-content">
-          <!-- Yellow Alert -->
           <div class="alert-box alert-yellow q-mb-md">
             <div class="alert-content">
               <div class="alert-label-group">
-                <div class="alert-title">Yellow</div>
-                <div class="alert-subtitle">First preventive notification</div>
+                <div class="alert-title">Amarilla</div>
+                <div class="alert-subtitle">Primera notificación preventiva</div>
               </div>
               <div class="alert-input-group">
                 <q-select
@@ -83,17 +114,16 @@
                   dense
                   class="alert-select"
                 />
-                <span class="alert-hint">days before expiration</span>
+                <span class="alert-hint">días antes del vencimiento</span>
               </div>
             </div>
           </div>
 
-          <!-- Orange Alert -->
           <div class="alert-box alert-orange q-mb-md">
             <div class="alert-content">
               <div class="alert-label-group">
-                <div class="alert-title">Orange</div>
-                <div class="alert-subtitle">Urgent attention notification</div>
+                <div class="alert-title">Naranja</div>
+                <div class="alert-subtitle">Notificación de atención urgente</div>
               </div>
               <div class="alert-input-group">
                 <q-select
@@ -103,17 +133,16 @@
                   dense
                   class="alert-select"
                 />
-                <span class="alert-hint">days before expiration</span>
+                <span class="alert-hint">días antes del vencimiento</span>
               </div>
             </div>
           </div>
 
-          <!-- Red Alert -->
           <div class="alert-box alert-red q-mb-md">
             <div class="alert-content">
               <div class="alert-label-group">
-                <div class="alert-title">Red</div>
-                <div class="alert-subtitle">Immediate critical notification</div>
+                <div class="alert-title">Roja</div>
+                <div class="alert-subtitle">Notificación crítica inmediata</div>
               </div>
               <div class="alert-input-group">
                 <q-select
@@ -123,7 +152,7 @@
                   dense
                   class="alert-select"
                 />
-                <span class="alert-hint">days before expiration</span>
+                <span class="alert-hint">días antes del vencimiento</span>
               </div>
             </div>
           </div>
@@ -137,116 +166,8 @@
         </q-card-section>
       </q-card>
 
-      <!-- Process Alerts Section -->
-      <div class="section-title q-mb-md q-mt-lg">
-        <h2 class="text-h6">Alertas de Proceso</h2>
-      </div>
-
-      <q-card class="section-card">
-        <div class="section-header">
-          <div class="header-title">Configuración de Alertas</div>
-        </div>
-
-        <q-card-section class="section-content">
-          <!-- Pending Log Alert -->
-          <div class="process-row q-mb-md">
-            <div class="process-label-group">
-              <div class="process-label">Alerta de bitácora pendiente</div>
-              <div class="process-sublabel">Notificar cuando una bitácora está a punto de vencer</div>
-            </div>
-            <div class="process-input-group">
-              <q-select
-                v-model="formData.pendingLogAlert"
-                :options="daysOptions"
-                outlined
-                dense
-                class="process-select"
-              />
-              <span class="process-hint">días antes</span>
-              <q-toggle
-                v-model="formData.pendingLogAlertEnabled"
-                color="green"
-              />
-            </div>
-          </div>
-
-          <!-- Pending Follow-up Alert -->
-          <div class="process-row q-mb-md">
-            <div class="process-label-group">
-              <div class="process-label">Alerta de seguimiento pendiente</div>
-              <div class="process-sublabel">Notificar cuando un seguimiento está a punto de vencer</div>
-            </div>
-            <div class="process-input-group">
-              <q-select
-                v-model="formData.pendingFollowUpAlert"
-                :options="daysOptions"
-                outlined
-                dense
-                class="process-select"
-              />
-              <span class="process-hint">días antes</span>
-              <q-toggle
-                v-model="formData.pendingFollowUpAlertEnabled"
-                color="green"
-              />
-            </div>
-          </div>
-
-          <!-- Critical Follow-up Alert -->
-          <div class="process-row q-mb-md">
-            <div class="process-label-group">
-              <div class="process-label">Alerta crítica de último seguimiento</div>
-              <div class="process-sublabel">Notificación crítica para el último seguimiento programado</div>
-            </div>
-            <div class="process-input-group">
-              <q-select
-                v-model="formData.criticalFollowUpAlert"
-                :options="daysOptions"
-                outlined
-                dense
-                class="process-select"
-              />
-              <span class="process-hint">días antes</span>
-              <q-toggle
-                v-model="formData.criticalFollowUpAlertEnabled"
-                color="green"
-              />
-            </div>
-          </div>
-
-          <!-- Instructor Review Time -->
-          <div class="process-row q-mb-md">
-            <div class="process-label-group">
-              <div class="process-label">Tiempo de revisión del instructor</div>
-              <div class="process-sublabel">Límite de tiempo y alerta para revisiones del instructor</div>
-            </div>
-            <div class="process-input-group">
-              <q-select
-                v-model="formData.instructorReviewTime"
-                :options="daysOptions"
-                outlined
-                dense
-                class="process-select"
-              />
-              <span class="process-hint">días antes</span>
-              <q-toggle
-                v-model="formData.instructorReviewTimeEnabled"
-                color="green"
-              />
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <BotonEnviar
-              label="Guardar Configuración"
-              @click="handleOpenConfirmation(SECTION_TYPES.PROCESS)"
-            />
-          </div>
-        </q-card-section>
-      </q-card>
     </div>
 
-    <!-- Confirmation Modal -->
     <modalComponent
       ref="confirmationModalRef"
       width="500px"
@@ -299,21 +220,18 @@ import modalComponent from '../../../components/modals/modalComponent.vue'
 
 
 const PARAMETER_NAMES = {
-  ALERTA_FICHAS_NUEVAS_MESES: 'ALERTA_FICHAS_NUEVAS_MESES',
-  VENCIMIENTO_FICHAS_ANTIGUAS: 'VENCIMIENTO_FICHAS_ANTIGUAS',
-  DIAS_ALERTA_AMARILLA: 'DIAS_ALERTA_AMARILLA',
-  DIAS_ALERTA_NARANJA: 'DIAS_ALERTA_NARANJA',
-  DIAS_ALERTA_ROJA_CRITICA: 'DIAS_ALERTA_ROJA_CRITICA',
-  DIAS_ALERTA_BITACORA_PENDIENTE: 'DIAS_ALERTA_BITACORA_PENDIENTE',
-  DIAS_ALERTA_SEGUIMIENTO_PENDIENTE: 'DIAS_ALERTA_SEGUIMIENTO_PENDIENTE',
-  DIAS_ALERTA_CRITICA_ULTIMO_SEGUIMIENTO: 'DIAS_ALERTA_CRITICA_ULTIMO_SEGUIMIENTO',
-  DIAS_ALERTA_REVISION_INSTRUCTOR: 'DIAS_ALERTA_REVISION_INSTRUCTOR'
+  ALERTAS_FICHAS_NUEVAS: 'ALERTAS FICHAS NUEVAS',
+  EXPIRACION_FICHAS_ANTIGUAS: 'EXPIRACION FICHAS ANTIGUAS',
+  ALERTA_AMARILLA: 'ALERTA AMARILLA',
+  ALERTA_NARANJA: 'ALERTA NARANJA',
+  ALERTA_ROJA_CRITICA: 'ALERTA ROJA CRITICA',
+  HORAS_MENSUALES_INSTRUCTORES: 'HORAS MENSUALES INSTRUCTORES',
+  MAXIMO_REGISTROS_POR_APRENDIZ: 'MAXIMO DE REGISTROS POR APRENDIZ/FICHA'
 }
 
 const SECTION_TYPES = {
   FICHE: 'fiche',
-  ESCALATED: 'escalated',
-  PROCESS: 'process'
+  ESCALATED: 'escalated'
 }
 
 
@@ -328,21 +246,13 @@ const parameterIds = ref({})
 const formData = ref({
   newRecordsTime: null,
   oldRecordsTime: null,
+  maxRecordsPerApprentice: null,
+  monthlyInstructorHours: null,
   yellowAlertDays: null,
   orangeAlertDays: null,
-  redAlertDays: null,
-  pendingLogAlert: null,
-  pendingLogAlertEnabled: false,
-  pendingFollowUpAlert: null,
-  pendingFollowUpAlertEnabled: false,
-  criticalFollowUpAlert: null,
-  criticalFollowUpAlertEnabled: false,
-  instructorReviewTime: null,
-  instructorReviewTimeEnabled: false
+  redAlertDays: null
 })
 
-const monthOptions = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
-const yearOptions = ref([1, 2, 3, 4, 5])
 const daysOptions = ref([1, 2, 3, 4, 5, 7, 10, 15, 20, 30, 45, 60])
 
 
@@ -358,7 +268,6 @@ async function fetchParameters() {
     }
     
 
-    // Sin usar forEach - usar while loop
     let paramIndex = 0
     while (paramIndex < data.length) {
       const param = data[paramIndex]
@@ -366,48 +275,37 @@ async function fetchParameters() {
         parameterIds.value[param.name] = param._id
         
         switch (param.name) {
-          case PARAMETER_NAMES.ALERTA_FICHAS_NUEVAS_MESES:
+          case PARAMETER_NAMES.ALERTAS_FICHAS_NUEVAS:
             formData.value.newRecordsTime = param.value
             break
-          case PARAMETER_NAMES.VENCIMIENTO_FICHAS_ANTIGUAS:
+          case PARAMETER_NAMES.EXPIRACION_FICHAS_ANTIGUAS:
             formData.value.oldRecordsTime = param.value
             break
-          case PARAMETER_NAMES.DIAS_ALERTA_AMARILLA:
+          case PARAMETER_NAMES.MAXIMO_REGISTROS_POR_APRENDIZ:
+            formData.value.maxRecordsPerApprentice = param.value
+            break
+          case PARAMETER_NAMES.HORAS_MENSUALES_INSTRUCTORES:
+            formData.value.monthlyInstructorHours = param.value
+            break
+          case PARAMETER_NAMES.ALERTA_AMARILLA:
             formData.value.yellowAlertDays = param.value
             break
-          case PARAMETER_NAMES.DIAS_ALERTA_NARANJA:
+          case PARAMETER_NAMES.ALERTA_NARANJA:
             formData.value.orangeAlertDays = param.value
             break
-          case PARAMETER_NAMES.DIAS_ALERTA_ROJA_CRITICA:
+          case PARAMETER_NAMES.ALERTA_ROJA_CRITICA:
             formData.value.redAlertDays = param.value
-            break
-          case PARAMETER_NAMES.DIAS_ALERTA_BITACORA_PENDIENTE:
-            formData.value.pendingLogAlert = param.value
-            formData.value.pendingLogAlertEnabled = param.status === 1
-            break
-          case PARAMETER_NAMES.DIAS_ALERTA_SEGUIMIENTO_PENDIENTE:
-            formData.value.pendingFollowUpAlert = param.value
-            formData.value.pendingFollowUpAlertEnabled = param.status === 1
-            break
-          case PARAMETER_NAMES.DIAS_ALERTA_CRITICA_ULTIMO_SEGUIMIENTO:
-            formData.value.criticalFollowUpAlert = param.value
-            formData.value.criticalFollowUpAlertEnabled = param.status === 1
-            break
-          case PARAMETER_NAMES.DIAS_ALERTA_REVISION_INSTRUCTOR:
-            formData.value.instructorReviewTime = param.value
-            formData.value.instructorReviewTimeEnabled = param.status === 1
             break
         }
       }
       paramIndex++
     }
     
-    notifications.success('Alert parameters loaded successfully.')
   } catch (error) {
     const errorMessage = error.response?.data?.message 
       || error.response?.data?.msg 
       || error?.message 
-      || 'Error loading alert parameters.'
+      || 'Error al cargar los parámetros de alerta.'
     notifications.error(errorMessage)
   } finally {
     isLoading.value = false
@@ -429,13 +327,9 @@ function handleCloseConfirmation() {
 function getSectionLabel() {
   switch (currentSection.value) {
     case SECTION_TYPES.FICHE:
-      return 'Do you want to save the Fiche Expiration configuration?'
+      return '¿Desea guardar la configuración de Fichas?'
     case SECTION_TYPES.ESCALATED:
-      return 'Do you want to save the Escalated Alerts configuration?'
-    case SECTION_TYPES.PROCESS:
-      return 'Do you want to save the Process Alerts configuration?'
-    default:
-      return 'Do you want to save the Alerts configuration?'
+      return '¿Desea guardar la configuración de Alertas escaladas?'
   }
 }
 
@@ -445,31 +339,15 @@ async function handleSaveConfiguration() {
     
     const updates = {}
     if (currentSection.value === SECTION_TYPES.FICHE) {
-      updates[PARAMETER_NAMES.ALERTA_FICHAS_NUEVAS_MESES] = { value: formData.value.newRecordsTime }
-      updates[PARAMETER_NAMES.VENCIMIENTO_FICHAS_ANTIGUAS] = { value: formData.value.oldRecordsTime }
+      updates[PARAMETER_NAMES.ALERTAS_FICHAS_NUEVAS] = { value: formData.value.newRecordsTime }
+      updates[PARAMETER_NAMES.EXPIRACION_FICHAS_ANTIGUAS] = { value: formData.value.oldRecordsTime }
+      updates[PARAMETER_NAMES.MAXIMO_REGISTROS_POR_APRENDIZ] = { value: formData.value.maxRecordsPerApprentice }
+      updates[PARAMETER_NAMES.HORAS_MENSUALES_INSTRUCTORES] = { value: formData.value.monthlyInstructorHours }
 
     } else if (currentSection.value === SECTION_TYPES.ESCALATED) {
-      updates[PARAMETER_NAMES.DIAS_ALERTA_AMARILLA] = { value: formData.value.yellowAlertDays }
-      updates[PARAMETER_NAMES.DIAS_ALERTA_NARANJA] = { value: formData.value.orangeAlertDays }
-      updates[PARAMETER_NAMES.DIAS_ALERTA_ROJA_CRITICA] = { value: formData.value.redAlertDays }
-
-    } else if (currentSection.value === SECTION_TYPES.PROCESS) {
-      updates[PARAMETER_NAMES.DIAS_ALERTA_BITACORA_PENDIENTE] = { 
-        value: formData.value.pendingLogAlert, 
-        status: formData.value.pendingLogAlertEnabled ? 1 : 0 
-      }
-      updates[PARAMETER_NAMES.DIAS_ALERTA_SEGUIMIENTO_PENDIENTE] = { 
-        value: formData.value.pendingFollowUpAlert, 
-        status: formData.value.pendingFollowUpAlertEnabled ? 1 : 0 
-      }
-      updates[PARAMETER_NAMES.DIAS_ALERTA_CRITICA_ULTIMO_SEGUIMIENTO] = { 
-        value: formData.value.criticalFollowUpAlert, 
-        status: formData.value.criticalFollowUpAlertEnabled ? 1 : 0 
-      }
-      updates[PARAMETER_NAMES.DIAS_ALERTA_REVISION_INSTRUCTOR] = { 
-        value: formData.value.instructorReviewTime, 
-        status: formData.value.instructorReviewTimeEnabled ? 1 : 0 
-      }
+      updates[PARAMETER_NAMES.ALERTA_AMARILLA] = { value: formData.value.yellowAlertDays }
+      updates[PARAMETER_NAMES.ALERTA_NARANJA] = { value: formData.value.orangeAlertDays }
+      updates[PARAMETER_NAMES.ALERTA_ROJA_CRITICA] = { value: formData.value.redAlertDays }
     }
 
     // Reemplazar for...in con while loop usando Object.keys
@@ -478,24 +356,27 @@ async function handleSaveConfiguration() {
     while (idx < paramNames.length) {
       const paramName = paramNames[idx]
       const paramId = parameterIds.value[paramName]
-      if (paramId) {
-        const updateData = updates[paramName]
-        await putData(`/parameters/updateParameter/${paramId}`, { value: updateData.value })
-        if (updateData.status !== undefined) {
-          await putData(`/parameters/updateParameterStatus/${paramId}`, { status: updateData.status })
+      const updateData = updates[paramName]
+      
+      if (paramId && updateData.value !== null && updateData.value !== undefined) {
+        // Validar que el valor sea válido antes de enviar
+        const valueToSend = Number(updateData.value)
+        
+        if (!isNaN(valueToSend) && valueToSend >= 0) {
+          await putData(`/parameters/updateParameter/${paramId}`, { value: valueToSend })
         }
       }
       idx++
     }
     
-    notifications.success('Configuration saved successfully.')
+    notifications.success('Configuración guardada exitosamente.')
     handleCloseConfirmation()
     await fetchParameters() 
   } catch (error) {
     const errorMessage = error.response?.data?.message 
       || error.response?.data?.msg 
       || error?.message 
-      || 'Error saving configuration.'
+      || 'Error al guardar la configuración.'
     notifications.error(errorMessage)
   } finally {
     isSaving.value = false
@@ -514,11 +395,6 @@ onMounted(() => {
   max-width: 1200px
   margin: 0 auto
 
-.section-title
-  color: #333
-  margin-bottom: 10px
-  padding-bottom: 10px
-  border-bottom: 2px solid #e0e0e0
 
 .section-card
   border-radius: 12px
@@ -533,11 +409,17 @@ onMounted(() => {
   font-weight: 600
   text-align: center
   border-radius: 10px 10px 0 0
+  display: flex
+  justify-content: center
+  align-items: center
 
 .header-title
   color: white
   font-size: 16px
   font-weight: 600
+  text-align: center
+  width: 100%
+  margin: 0
 
 .section-content
   padding: 25px 20px
@@ -548,32 +430,42 @@ onMounted(() => {
   justify-content: space-between
   margin-bottom: 25px
   gap: 20px
+  min-height: 60px
 
 .config-label-group
   flex: 1
+  display: flex
+  flex-direction: column
+  justify-content: center
 
 .config-label
   font-size: 14px
   font-weight: 600
   color: #000
   margin-bottom: 5px
+  line-height: 1.2
 
 .config-sublabel
   font-size: 12px
   color: #666
+  line-height: 1.2
 
 .config-input-group
   display: flex
   align-items: center
   gap: 10px
+  flex-shrink: 0
+  min-width: 150px
 
 .custom-select
   width: 100px
+  min-width: 100px
 
 .input-hint
   font-size: 12px
   color: #666
   white-space: nowrap
+  min-width: 50px
 
 .alert-box
   border-radius: 8px
@@ -597,32 +489,42 @@ onMounted(() => {
   align-items: center
   justify-content: space-between
   gap: 15px
+  min-height: 50px
 
 .alert-label-group
   flex: 1
+  display: flex
+  flex-direction: column
+  justify-content: center
 
 .alert-title
   font-size: 14px
   font-weight: 700
   color: #000
   margin-bottom: 3px
+  line-height: 1.2
 
 .alert-subtitle
   font-size: 11px
   color: #666
+  line-height: 1.2
 
 .alert-input-group
   display: flex
   align-items: center
   gap: 8px
+  flex-shrink: 0
+  min-width: 180px
 
 .alert-select
   width: 80px
+  min-width: 80px
 
 .alert-hint
   font-size: 11px
   color: #666
   white-space: nowrap
+  min-width: 120px
 
 .process-row
   display: flex
@@ -632,37 +534,49 @@ onMounted(() => {
   background: #f9f9f9
   border-radius: 8px
   gap: 15px
+  min-height: 60px
 
 .process-label-group
   flex: 1
+  display: flex
+  flex-direction: column
+  justify-content: center
 
 .process-label
   font-size: 14px
   font-weight: 600
   color: #000
   margin-bottom: 3px
+  line-height: 1.2
 
 .process-sublabel
   font-size: 11px
   color: #666
+  line-height: 1.2
 
 .process-input-group
   display: flex
   align-items: center
   gap: 10px
+  flex-shrink: 0
+  min-width: 150px
 
 .process-select
   width: 80px
+  min-width: 80px
 
 .process-hint
   font-size: 11px
   color: #666
   white-space: nowrap
+  min-width: 50px
 
 .form-actions
   display: flex
   justify-content: center
+  align-items: center
   margin-top: 30px
+  width: 100%
 
 .modal-header-content
   display: flex
@@ -691,11 +605,14 @@ onMounted(() => {
   .process-row
     flex-direction: column
     align-items: flex-start
+    min-height: auto
 
   .alert-input-group,
-  .process-input-group
+  .process-input-group,
+  .config-input-group
     width: 100%
     justify-content: space-between
+    margin-top: 10px
 
 @media (max-width: 480px)
   .container
@@ -721,6 +638,10 @@ onMounted(() => {
 
   .form-actions
     margin-top: 20px
+    display: flex
+    justify-content: center
+    align-items: center
+    width: 100%
 
   .modal-footer-buttons
     flex-direction: column
@@ -807,9 +728,15 @@ onMounted(() => {
   .section-header
     padding: 12px 15px
     font-size: 14px
+    display: flex
+    justify-content: center
+    align-items: center
 
   .header-title
     font-size: 14px
+    text-align: center
+    width: 100%
+    margin: 0
 
   .modal-body-content
     padding: 15px
@@ -865,12 +792,22 @@ onMounted(() => {
   .section-header
     padding: 10px 12px
     font-size: 13px
+    display: flex
+    justify-content: center
+    align-items: center
 
   .header-title
     font-size: 13px
+    text-align: center
+    width: 100%
+    margin: 0
 
   .form-actions
     margin-top: 15px
+    display: flex
+    justify-content: center
+    align-items: center
+    width: 100%
 
   .modal-body-content
     padding: 12px
