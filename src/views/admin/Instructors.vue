@@ -1,10 +1,9 @@
-﻿
 <template>
   <div class="q-pa-md">
     <BackButton />
     
     <div class="text-center q-mb-lg">
-      <h1 class="text-weight-bold text-black q-my-md instructors-title">INSTRUCTORES</h1>
+      <h1 class="text-weight-bold text-black q-my-md" style="font-size: 3rem;">INSTRUCTORES</h1>
     </div>
 
     <!-- Stats Cards -->
@@ -623,67 +622,133 @@ onMounted(() => {
 .stat-card:hover
   transform: translateY(-5px)
 
+// ========== ESTILOS ESTANDARIZADOS PARA MODALES ==========
 
-.modal-content-wrapper
-  padding: 20px
-  // ELIMINADO: max-height y overflow-y para quitar el scroll completamente
+// Estilos base para modales
+:deep(.q-dialog__inner > .q-card)
+  border-radius: 12px
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15)
 
-@media (max-width: 768px)
-  .modal-content-wrapper
-    padding: 15px
+:deep(.q-card__section--vert)
+  padding: 0
 
-@media (max-width: 480px)
-  .modal-content-wrapper
-    padding: 10px
+// Headers de modales con gradiente verde
+:deep(.q-dialog .q-card > .q-card__section:first-child)
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%)
+  padding: 20px 24px
+  border-radius: 12px 12px 0 0
 
-.modal-footer-wrapper
-  padding: 20px
-  border-top: 1px solid #e0e0e0
-
-@media (max-width: 768px)
-  .modal-footer-wrapper
-    padding: 15px
-
-@media (max-width: 480px)
-  .modal-footer-wrapper
-    padding: 10px
+:deep(.q-dialog .text-h6)
+  color: white
+  font-size: 18px
+  font-weight: 600
+  margin: 0
 
 .modal-header
-  font-size: 1.25rem
+  color: white
+  font-size: 18px
+  font-weight: 600
+  margin: 0
 
 @media (max-width: 768px)
+  :deep(.q-dialog .q-card > .q-card__section:first-child)
+    padding: 18px 20px
+
+  :deep(.q-dialog .text-h6)
+    font-size: 16px
+
   .modal-header
-    font-size: 1.1rem
+    font-size: 16px
 
 @media (max-width: 480px)
-  .modal-header
-    font-size: 1rem
+  :deep(.q-dialog .q-card > .q-card__section:first-child)
+    padding: 16px 18px
 
+  :deep(.q-dialog .text-h6)
+    font-size: 15px
+
+  .modal-header
+    font-size: 15px
+
+// Modal Body
+.modal-content-wrapper
+  padding: 24px 28px
+  background: white
+
+:deep(.q-dialog .q-card__section:not(:first-child):not(:last-child))
+  padding: 24px 28px
+
+@media (max-width: 768px)
+  .modal-content-wrapper
+    padding: 20px 24px
+
+  :deep(.q-dialog .q-card__section:not(:first-child):not(:last-child))
+    padding: 20px 24px
+
+@media (max-width: 480px)
+  .modal-content-wrapper
+    padding: 16px 20px
+
+  :deep(.q-dialog .q-card__section:not(:first-child):not(:last-child))
+    padding: 16px 20px
+
+// Modal Footer
+.modal-footer-wrapper
+  padding: 20px 24px
+  background: #F8F9FA
+  border-radius: 0 0 12px 12px
+  border-top: 1px solid #E0E0E0
+
+:deep(.q-dialog .q-card__section:last-child)
+  background: #F8F9FA
+  border-radius: 0 0 12px 12px
+  padding: 20px 24px
+  border-top: 1px solid #E0E0E0
+
+@media (max-width: 768px)
+  .modal-footer-wrapper
+    padding: 18px 20px
+
+  :deep(.q-dialog .q-card__section:last-child)
+    padding: 18px 20px
+
+@media (max-width: 480px)
+  .modal-footer-wrapper
+    padding: 16px 18px
+
+  :deep(.q-dialog .q-card__section:last-child)
+    padding: 16px 18px
+
+// Section Titles
 .section-title
-  color: #39a900
+  color: var(--color-primary)
   font-weight: 600
   font-size: 1.3rem
   margin-bottom: 20px
-  padding-left: 8px
-  border-left: 4px solid #39a900
+  padding-left: 12px
+  border-left: 4px solid var(--color-primary)
 
 @media (max-width: 768px)
   .section-title
     font-size: 1.2rem
     margin-bottom: 15px
+    padding-left: 10px
 
 @media (max-width: 480px)
   .section-title
     font-size: 1.1rem !important
     margin-bottom: 12px
+    padding-left: 8px
 
+// Data Grid
 .data-grid
   display: grid
   gap: 16px
-  background-color: white
+  background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%)
   padding: 20px
   border-radius: 8px
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05)
+  border: 1px solid #E0E0E0
 
 @media (max-width: 768px)
   .data-grid
@@ -699,6 +764,11 @@ onMounted(() => {
   display: grid
   gap: 16px
   align-items: center
+  padding: 8px 0
+  border-bottom: 1px solid #F0F0F0
+
+.data-row:last-child
+  border-bottom: none
 
 // Desktop layout (2 columns)
 @media (min-width: 768px)
@@ -716,20 +786,21 @@ onMounted(() => {
 
 .text-weight-bold
   color: #2c3e50
-  font-size: 2.5rem
+  font-size: 0.95rem
   font-weight: 600
 
 @media (max-width: 768px)
   .text-weight-bold
-    font-size: 1.8rem
+    font-size: 0.9rem
 
 @media (max-width: 480px)
   .text-weight-bold
-    font-size: 1.8rem
+    font-size: 0.85rem
 
 .data-value
   color: #34495e
   font-size: 0.95rem
+  font-weight: 500
 
 @media (max-width: 768px)
   .data-value
@@ -746,7 +817,7 @@ onMounted(() => {
 .hours-highlight
   font-size: 1.5rem
   font-weight: bold
-  color: #39a900
+  color: var(--color-primary)
 
 @media (max-width: 768px)
   .hours-highlight
@@ -756,31 +827,95 @@ onMounted(() => {
   .hours-highlight
     font-size: 1.2rem
 
+// Input Fields
+:deep(.q-field--outlined .q-field__control)
+  border-radius: 8px
+  border: 1px solid #E0E0E0
+  transition: all 0.3s ease
+  background: white
+
+:deep(.q-field--outlined.q-field--focused .q-field__control)
+  border-color: var(--color-primary)
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1)
+
+:deep(.q-field--outlined .q-field__control:hover)
+  border-color: var(--color-primary)
+
+:deep(.q-field--outlined .q-field__control:before)
+  border: none
+
+// Confirmation Modal
 .confirmation-body
   text-align: center
+  padding: 24px 28px
 
 .confirmation-text
   font-size: 16px
   margin-bottom: 15px
-  line-height: 1.5
-  color: #333
+  line-height: 1.6
+  color: #2C3E50
+
+.confirmation-text strong
+  color: var(--color-primary)
+  font-weight: 600
 
 @media (max-width: 768px)
+  .confirmation-body
+    padding: 20px 24px
+
   .confirmation-text
     font-size: 15px
     margin-bottom: 12px
 
 @media (max-width: 480px)
+  .confirmation-body
+    padding: 16px 20px
+
   .confirmation-text
     font-size: 14px
     margin-bottom: 10px
+
+// Badges
+:deep(.q-badge)
+  padding: 6px 12px
+  border-radius: 6px
+  font-weight: 500
+  font-size: 0.85rem
+
+// Buttons
+:deep(.q-btn.boton-cerrar),
+:deep(.q-btn.boton-enviar)
+  border-radius: 8px
+  padding: 10px 32px
+  font-size: 14px
+  font-weight: 600
+  text-transform: none
+  min-width: 140px
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)
+  transition: all 0.3s ease
+
+:deep(.q-btn.boton-cerrar:hover),
+:deep(.q-btn.boton-enviar:hover)
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15)
+  transform: translateY(-2px)
+
+:deep(.q-btn.boton-enviar)
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%)
+
+:deep(.q-btn.boton-enviar:hover)
+  background: linear-gradient(135deg, var(--color-primary-hover-dark) 0%, var(--color-primary) 100%)
 
 // Button responsiveness
 .full-width-sm-auto
   @media (max-width: 767px)
     width: 100%
 
+  @media (max-width: 480px)
+    :deep(.q-btn)
+      padding: 10px 24px
+      font-size: 13px
 
+// Modal Sizes
 :deep(.details-modal)
   .q-dialog
     .q-dialog__inner
@@ -830,7 +965,6 @@ onMounted(() => {
           max-width: 98vw !important
           margin: 0 !important
 
-
 :deep(.q-dialog)
   @media (max-width: 767px)
     .q-dialog__inner
@@ -842,28 +976,5 @@ onMounted(() => {
   @media (max-width: 480px)
     .q-dialog__inner
       padding: 12px
-
-// Filter responsiveness
-@media (max-width: 599px)
-  .row.items-center.q-mb-md.q-gutter-y-sm
-    .col-12
-      margin-bottom: 12px
-
-// Table responsiveness
-@media (max-width: 768px)
-  :deep(.q-table)
-    font-size: 0.85rem
-
-    .q-table th,
-    .q-table td
-      padding: 8px 4px
-
-@media (max-width: 480px)
-  :deep(.q-table)
-    font-size: 0.8rem
-
-    .q-table th,
-    .q-table td
-      padding: 6px 3px
 
 </style>
