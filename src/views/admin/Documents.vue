@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="q-pa-md">
     <BackButton />
     
@@ -155,4 +155,256 @@ onMounted(() => {
 .container
   max-width: 1400px
   margin: 0 auto
+
+/* ========== ESTILOS ESTANDARIZADOS PARA MODALES ========== */
+
+/* Estilos base para modales */
+:deep(.q-dialog__inner > .q-card)
+  border-radius: 12px
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15)
+
+:deep(.q-card__section--vert)
+  padding: 0
+
+/* Headers de modales con gradiente verde */
+:deep(.q-dialog .q-card > .q-card__section:first-child)
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%)
+  padding: 20px 24px
+  border-radius: 12px 12px 0 0
+
+:deep(.q-dialog .text-h6)
+  color: white
+  font-size: 18px
+  font-weight: 600
+  margin: 0
+
+/* Modal Body */
+:deep(.q-dialog .q-card__section:not(:first-child):not(:last-child))
+  padding: 24px 28px
+  background: white
+
+/* Modal Footer */
+:deep(.q-dialog .q-card__section:last-child)
+  background: #F8F9FA
+  border-radius: 0 0 12px 12px
+  padding: 20px 24px
+  border-top: 1px solid #E0E0E0
+
+/* Section Titles */
+.section-title
+  color: var(--color-primary)
+  font-weight: 600
+  font-size: 1.3rem
+  margin-bottom: 20px
+  padding-left: 12px
+  border-left: 4px solid var(--color-primary)
+
+/* Data Grid */
+.data-grid
+  display: grid
+  gap: 16px
+  background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%)
+  padding: 20px
+  border-radius: 8px
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05)
+  border: 1px solid #E0E0E0
+
+.data-row
+  display: grid
+  grid-template-columns: 180px 1fr
+  gap: 16px
+  align-items: center
+  padding: 8px 0
+  border-bottom: 1px solid #F0F0F0
+
+.data-row:last-child
+  border-bottom: none
+
+.text-weight-bold
+  color: #2c3e50
+  font-size: 0.95rem
+  font-weight: 600
+
+.data-value
+  color: #34495e
+  font-size: 0.95rem
+  font-weight: 500
+
+/* Details Container */
+.details-container
+  display: flex
+  flex-direction: column
+  gap: 16px
+
+.detail-row
+  display: flex
+  flex-direction: column
+  gap: 8px
+  padding: 14px 16px
+  background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%)
+  border-radius: 8px
+  border: 1px solid #E0E0E0
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05)
+  transition: all 0.3s ease
+
+.detail-row:hover
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)
+  transform: translateY(-2px)
+
+.detail-label
+  font-weight: 600
+  color: #2C3E50
+  font-size: 0.875rem
+  text-transform: uppercase
+  letter-spacing: 0.5px
+
+.detail-value
+  font-size: 1rem
+  color: #34495e
+  font-weight: 500
+
+/* Badges */
+:deep(.q-badge)
+  padding: 6px 12px
+  border-radius: 6px
+  font-weight: 500
+  font-size: 0.85rem
+
+/* Botones */
+:deep(.q-btn.boton-cerrar),
+:deep(.q-btn.boton-enviar)
+  border-radius: 8px
+  padding: 10px 24px
+  font-size: 14px
+  font-weight: 600
+  text-transform: none
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)
+  transition: all 0.3s ease
+
+:deep(.q-btn.boton-cerrar:hover),
+:deep(.q-btn.boton-enviar:hover)
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15)
+  transform: translateY(-2px)
+
+:deep(.q-btn.boton-enviar)
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%)
+
+:deep(.q-btn.boton-enviar:hover)
+  background: linear-gradient(135deg, var(--color-primary-hover-dark) 0%, var(--color-primary) 100%)
+
+/* Responsive */
+@media (max-width: 768px)
+  :deep(.q-dialog .q-card > .q-card__section:first-child)
+    padding: 18px 20px
+
+  :deep(.q-dialog .text-h6)
+    font-size: 16px
+
+  :deep(.q-dialog .q-card__section:not(:first-child):not(:last-child))
+    padding: 20px 24px
+
+  :deep(.q-dialog .q-card__section:last-child)
+    padding: 18px 20px
+
+  .section-title
+    font-size: 1.2rem
+    margin-bottom: 15px
+    padding-left: 10px
+
+  .data-grid
+    gap: 12px
+    padding: 15px
+
+  .data-row
+    grid-template-columns: 1fr
+    gap: 8px
+    padding: 6px 0
+
+  .data-row .text-weight-bold
+    margin-bottom: 4px
+
+  .text-weight-bold
+    font-size: 0.9rem
+
+  .data-value
+    font-size: 0.9rem
+
+  .detail-row
+    padding: 12px 14px
+
+  .detail-label
+    font-size: 0.8rem
+
+  .detail-value
+    font-size: 0.95rem
+
+@media (max-width: 480px)
+  :deep(.q-dialog .q-card > .q-card__section:first-child)
+    padding: 16px 18px
+
+  :deep(.q-dialog .text-h6)
+    font-size: 15px
+
+  :deep(.q-dialog .q-card__section:not(:first-child):not(:last-child))
+    padding: 16px 20px
+
+  :deep(.q-dialog .q-card__section:last-child)
+    padding: 16px 18px
+
+  .section-title
+    font-size: 1.1rem !important
+    margin-bottom: 12px
+    padding-left: 8px
+
+  .data-grid
+    gap: 10px
+    padding: 12px
+
+  .data-row
+    padding: 4px 0
+
+  .text-weight-bold
+    font-size: 0.85rem
+
+  .data-value
+    font-size: 0.85rem
+
+  .details-container
+    gap: 12px
+
+  .detail-row
+    padding: 10px 12px
+    gap: 6px
+
+  .detail-label
+    font-size: 0.75rem
+
+  .detail-value
+    font-size: 0.9rem
+
+  :deep(.q-btn.boton-cerrar),
+  :deep(.q-btn.boton-enviar)
+    padding: 10px 20px
+    font-size: 13px
+
+/* Ajustes específicos para modales grandes */
+@media (min-width: 769px)
+  :deep(.q-dialog__inner)
+    padding: 24px
+
+@media (max-width: 768px)
+  :deep(.q-dialog__inner)
+    padding: 16px
+
+  :deep(.q-card)
+    margin: 0
+
+@media (max-width: 480px)
+  :deep(.q-dialog__inner)
+    padding: 12px
+
+  :deep(.q-card)
+    width: 98vw !important
+    max-width: 98vw !important
+    margin: 0 !important
 </style>
