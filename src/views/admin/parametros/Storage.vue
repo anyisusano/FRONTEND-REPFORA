@@ -1,6 +1,3 @@
-Storage
-
-
 <template>
   <div class="q-pa-md">
     <BackButton />
@@ -25,6 +22,24 @@ Storage
                 :disable="validationsLoading"
                 @update:model-value="handleSignedDocsValidationChange"
               />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="form-label">Frecuencia cargue archivos</label>
+            <div class="form-input-group">
+              <q-input
+                v-model.number="fileUploadFrequency"
+                type="number"
+                outlined
+                dense
+                class="custom-input"
+                :loading="validationsLoading"
+                @update:model-value="handleFileUploadFrequencyChange"
+                :min="1"
+                :max="365"
+              />
+              <span class="input-hint">días</span>
             </div>
           </div>
 
@@ -96,6 +111,7 @@ const confirmationModalRef = ref(null)
 
 // Validations state
 const signedDocsValidation = ref(true)
+const fileUploadFrequency = ref(15)
 const validationsLoading = ref(false)
 const isSaving = ref(false)
 const securityParameters = ref([])
@@ -125,6 +141,8 @@ async function loadValidationsParameters() {
         
         if (param.name === 'VERIFICACION DE DOCUMENTOS FIRMADOS') {
           signedDocsValidation.value = param.value
+        } else if (param.name === 'FRECUENCIA CARGUE ARCHIVOS') {
+          fileUploadFrequency.value = param.value
         }
       }
       paramIndex++
@@ -141,6 +159,10 @@ function handleSignedDocsValidationChange(value) {
   signedDocsValidation.value = value
 }
 
+function handleFileUploadFrequencyChange(value) {
+  fileUploadFrequency.value = value
+}
+
 function handleOpenConfirmation() {
   confirmationModalRef.value?.openDialog()
 }
@@ -153,14 +175,33 @@ async function handleSaveConfiguration() {
   try {
     isSaving.value = true
     
-    const paramId = parameterIds.value['VERIFICACION DE DOCUMENTOS FIRMADOS']
+    const signedDocsParamId = parameterIds.value['VERIFICACION DE DOCUMENTOS FIRMADOS']
+    const frequencyParamId = parameterIds.value['FRECUENCIA CARGUE ARCHIVOS']
     
-    if (paramId) {
-      await putData(`/parameters/updateParameter/${paramId}`, { 
-        value: signedDocsValidation.value 
-      })
+    const promises = []
+    
+    // Actualizar parámetro de validación de documentos firmados
+    if (signedDocsParamId) {
+      promises.push(
+        putData(`/parameters/updateParameter/${signedDocsParamId}`, { 
+          value: signedDocsValidation.value 
+        })
+      )
+    }
+    
+    // Actualizar parámetro de frecuencia de carga de archivos
+    if (frequencyParamId) {
+      promises.push(
+        putData(`/parameters/updateParameter/${frequencyParamId}`, { 
+          value: Number(fileUploadFrequency.value)
+        })
+      )
+    }
+    
+    if (promises.length > 0) {
+      await Promise.all(promises)
     } else {
-      notifications.error('No se encontró el parámetro para actualizar')
+      notifications.error('No se encontraron los parámetros para actualizar')
       return
     }
     
@@ -237,6 +278,16 @@ async function handleSaveConfiguration() {
 .form-input-group > *
   align-self: center
 
+.custom-input
+  width: 120px
+
+.input-hint
+  font-size: 12px
+  color: #666
+  white-space: nowrap
+  min-width: 30px
+  line-height: 1.4
+
 .form-actions
   display: flex
   justify-content: center
@@ -275,4 +326,7 @@ async function handleSaveConfiguration() {
   .form-input-group
     width: 100%
     justify-content: space-between
+
+  .custom-input
+    flex: 1
 </style>
