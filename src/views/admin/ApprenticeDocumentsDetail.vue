@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="detalle-aprendiz-page">
     <!-- Header con flecha de retroceso -->
     <div class="header">
@@ -867,26 +867,91 @@ async function confirmarRechazo() {
 
 /* ========== ESTILOS ACTUALIZADOS PARA MODALES ========== */
 
+/* Estilos base para headers de modales */
+:deep(.q-dialog__inner > .q-card) {
+  max-width: 600px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+:deep(.q-card__section--vert) {
+  padding: 0;
+}
+
+/* Headers de modales estandarizados */
+:deep(.q-dialog .q-card > .q-card__section:first-child) {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%);
+  padding: 20px 24px;
+  border-radius: 12px 12px 0 0;
+}
+
+:deep(.q-dialog .text-h6) {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
 /* Modal Header Simple */
 .modal-header-custom {
-  padding: 20px 25px 15px;
-  border-bottom: 1px solid #E0E0E0;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%);
+  padding: 20px 24px;
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
 }
 
 .modal-title {
   font-size: 18px;
-  font-weight: 700;
-  color: #000;
+  font-weight: 600;
+  color: white;
   margin: 0;
   text-align: center;
   width: 100%;
 }
 
-/* Modal Body */
-.modal-body-custom {
-  padding: 25px 30px;
+.modal-header-simple {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%);
+  padding: 20px 24px;
+  border-radius: 12px 12px 0 0;
 }
 
+.modal-title-center {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+  text-align: center;
+}
+
+/* Modal Header Empresa */
+.modal-header-empresa {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%);
+  padding: 20px 24px;
+  border-radius: 12px 12px 0 0;
+  text-align: center;
+  border-bottom: none;
+}
+
+.modal-title-empresa {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+/* Modal Body estandarizado */
+.modal-body-custom,
+.modal-confirmacion-body,
+.modal-exito-body {
+  padding: 24px 28px;
+  background: white;
+}
+
+:deep(.q-dialog .q-card__section:not(:first-child):not(:last-child)) {
+  padding: 24px 28px;
+}
+
+/* Estilos para inputs y selects en modales */
 .form-group {
   margin-bottom: 20px;
 }
@@ -895,7 +960,7 @@ async function confirmarRechazo() {
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: #2C3E50;
   margin-bottom: 8px;
 }
 
@@ -903,142 +968,145 @@ async function confirmarRechazo() {
 :deep(.custom-select-modal .q-field__control) {
   border-radius: 8px;
   min-height: 48px;
-  border: 1px solid #DCDFE6;
+  border: 1px solid #E0E0E0;
+  background: white;
+  transition: all 0.3s ease;
 }
 
-:deep(.custom-select-modal.q-field--focused .q-field__control:before) {
-  border-color: var(--color-border-primary);
-  border-width: 2px;
+:deep(.custom-select-modal.q-field--focused .q-field__control) {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+:deep(.custom-select-modal .q-field__control:hover) {
+  border-color: var(--color-primary);
 }
 
 :deep(.custom-select-modal .q-field__control:before) {
-  border-bottom: 1px solid #DCDFE6;
+  border: none;
 }
 
 :deep(.custom-select-modal .q-field__native) {
   padding: 12px 16px;
   font-size: 14px;
+  color: #2C3E50;
+}
+
+/* Textarea en modales */
+:deep(.q-dialog .q-field--outlined .q-field__control) {
+  border-radius: 8px;
+  border: 1px solid #E0E0E0;
+  transition: all 0.3s ease;
+}
+
+:deep(.q-dialog .q-field--outlined.q-field--focused .q-field__control) {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+:deep(.q-dialog .q-field--outlined .q-field__control:before) {
+  border: none;
 }
 
 /* Línea divisoria */
-.divider-line {
+.divider-line,
+.divider-line-modal {
   height: 1px;
-  background-color: #E0E0E0;
+  background: linear-gradient(90deg, transparent, #E0E0E0 20%, #E0E0E0 80%, transparent);
   margin: 20px 0;
 }
 
 /* Sección de información del aprendiz */
 .aprendiz-info-section {
-  background-color: #F8F9FA;
+  background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
   border-radius: 8px;
-  padding: 15px;
-  border-left: 4px solid var(--color-border-primary);
+  padding: 16px;
+  border-left: 4px solid var(--color-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .aprendiz-info-header {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .aprendiz-info-header strong {
   font-size: 14px;
-  color: #000;
+  color: #2C3E50;
+  font-weight: 600;
 }
 
 .aprendiz-details {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
 }
 
 .detail-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 0;
+  padding: 6px 0;
+  border-bottom: 1px solid #F0F0F0;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
 }
 
 .detail-label {
   font-size: 13px;
-  color: #666;
+  color: #7F8C8D;
 }
 
 .detail-value {
   font-size: 13px;
-  color: #000;
+  color: #2C3E50;
   font-weight: 500;
 }
 
-/* Footer del modal simple */
-.modal-footer-custom-simple {
-  display: flex;
-  justify-content: center;
-  padding: 20px 25px;
-  border-top: 1px solid #E0E0E0;
-}
-
-.boton-asignar-modal {
-  background-color: var(--color-primary);
-  color: white;
-  border-radius: 8px;
-  padding: 10px 40px;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: none;
-  min-width: 150px;
-}
-
-.boton-asignar-modal:hover {
-  background-color: var(--color-primary-hover-dark);
-}
-
-/* Modal de confirmación */
-.modal-confirmacion-body {
-  padding: 25px 30px;
-}
-
-.confirmacion-section {
-  margin-bottom: 20px;
-}
-
-.confirmacion-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 10px;
-}
-
+/* Confirmación - Chip de área */
 .selected-area-chip {
-  background-color: #E8F5E9;
+  background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
   color: var(--color-primary);
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 10px 18px;
+  border-radius: 8px;
   font-weight: 500;
   font-size: 14px;
   border: 1px solid var(--color-border-primary);
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.1);
 }
 
+/* Instructor confirmación */
 .instructor-confirmacion {
   display: flex;
   align-items: center;
   gap: 15px;
-  padding: 12px;
-  background-color: #F8F9FA;
+  padding: 14px;
+  background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
   border-radius: 8px;
   border: 1px solid #E0E0E0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.instructor-confirmacion:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .instructor-avatar-confirm {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 18px;
   color: white;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
 
 .instructor-datos-confirm {
@@ -1048,271 +1116,93 @@ async function confirmarRechazo() {
 .instructor-nombre-confirm {
   font-size: 15px;
   font-weight: 600;
-  color: #000;
+  color: #2C3E50;
   margin: 0 0 4px 0;
 }
 
 .instructor-cargo-confirm {
   font-size: 13px;
-  color: #666;
+  color: #7F8C8D;
   margin: 0;
 }
 
-/* Footer dual para aceptar/rechazar */
-.modal-footer-custom-dual {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  padding: 20px 25px;
-  border-top: 1px solid #E0E0E0;
-}
-
-.boton-aceptado-modal {
-  background-color: var(--color-primary);
-  color: white;
-  border-radius: 8px;
-  padding: 10px 30px;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: none;
-  min-width: 120px;
-}
-
-.boton-aceptado-modal:hover {
-  background-color: var(--color-primary-hover-dark);
-}
-
-.boton-rechazar-modal {
-  background-color: #DC3545;
-  color: white;
-  border-radius: 8px;
-  padding: 10px 30px;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: none;
-  min-width: 120px;
-}
-
-.boton-rechazar-modal:hover {
-  background-color: #C82333;
-}
-
-/* Modal de éxito con header de empresa */
-.modal-header-empresa {
-  padding: 20px 25px 15px;
-  border-bottom: 1px solid #E0E0E0;
-  text-align: center;
-}
-
-.modal-title-empresa {
-  font-size: 20px;
-  font-weight: 700;
-  color: #000;
-  margin: 0;
-}
-
-/* Cuerpo del modal de éxito */
-.modal-exito-body {
-  padding: 0 30px 20px;
-}
-
-.aprendiz-nombre-modal {
-  font-size: 18px;
-  font-weight: 700;
-  color: #000;
-  text-align: center;
-  margin: 0 0 15px 0;
-}
-
-.banner-ficha-modal {
-  background: var(--gradient-primary-dark);
-  padding: 12px 16px;
-  text-align: center;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.instructor-asignado-modal {
-  background-color: #E8F5E9;
-  padding: 15px 18px;
-  border-radius: 8px;
-  margin-bottom: 18px;
-}
-
-.instructor-title-modal {
-  font-size: 14px;
-  font-weight: 700;
-  color: #000;
-  margin: 0 0 12px 0;
-}
-
-.instructor-info-modal {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.instructor-avatar-modal {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  background-color: var(--color-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  color: white;
-}
-
-.instructor-datos-modal {
-  flex: 1;
-}
-
-.instructor-nombre-modal {
-  font-size: 14px;
-  font-weight: 600;
-  color: #000;
-  margin: 0 0 3px 0;
-}
-
-.instructor-cargo-modal {
-  font-size: 12px;
-  color: #666;
-  margin: 0;
-}
-
-.divider-line-modal {
-  height: 1px;
-  background-color: #E0E0E0;
-  margin: 20px 0;
-}
-
-.mensaje-contrato-modal {
-  background-color: #F8F9FA;
-  padding: 10px 15px;
-  border-radius: 6px;
-  margin-bottom: 18px;
-  border-left: 3px solid var(--color-border-primary);
-}
-
-.mensaje-contrato-modal p {
-  margin: 0;
-  font-size: 13px;
-  color: #333;
-  line-height: 1.5;
-}
-
-.mensaje-contrato-modal strong {
-  color: #000;
-  font-weight: 600;
-}
-
-/* Tabla en modal */
-.tabla-documentos-modal {
-  margin-top: 15px;
-}
-
-.simple-table-modal {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border: 1px solid #E0E0E0;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-.simple-table-modal thead tr {
-  background-color: var(--color-primary);
-}
-
-.simple-table-modal thead th {
-  color: white;
-  font-weight: 600;
-  font-size: 13px;
-  padding: 10px 12px;
-  text-align: center;
-}
-
-.simple-table-modal thead th.text-left {
-  text-align: left;
-}
-
-.simple-table-modal tbody td {
-  padding: 10px 12px;
-  font-size: 12px;
-  color: #333;
-  border-bottom: 1px solid #F0F0F0;
-}
-
-.simple-table-modal tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.ver-documentos-link-modal {
-  color: var(--color-primary);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 12px;
-  transition: color 0.2s;
-}
-
-.ver-documentos-link-modal:hover {
-  color: var(--color-primary-hover-dark);
-  text-decoration: underline;
-}
-
-.postfoneidos-text {
-  font-size: 11px;
-  color: #666;
-  text-align: center;
-  margin: 5px 0 0 0;
-  font-style: italic;
-}
-
+/* Footers de modales estandarizados */
+.modal-footer-custom-simple,
+.modal-footer-custom-dual,
 .modal-footer-custom-center {
   display: flex;
   justify-content: center;
-  padding: 15px 25px 20px;
+  gap: 12px;
+  padding: 20px 24px;
+  background: #F8F9FA;
+  border-radius: 0 0 12px 12px;
+  border-top: 1px solid #E0E0E0;
 }
 
-/* Botón flotante */
-.fab-notificaciones {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  width: 52px;
-  height: 52px;
+:deep(.q-dialog .q-card__section:last-child) {
+  background: #F8F9FA;
+  border-radius: 0 0 12px 12px;
+  padding: 20px 24px;
 }
 
-/* Ajustes específicos para la tabla maintable */
-:deep(.tabla-container) {
-  padding: 0 !important;
-  margin: 0 !important;
-  width: 100% !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-}
-
-:deep(.custom-table) {
-  border: 1px solid #E0E0E0;
+/* Botones de modales estandarizados */
+.boton-asignar-modal,
+.boton-aceptado-modal {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover-dark) 100%);
+  color: white;
   border-radius: 8px;
-  overflow: hidden;
+  padding: 10px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+  min-width: 140px;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  transition: all 0.3s ease;
 }
 
-:deep(.q-table__top) {
-  display: none;
+.boton-asignar-modal:hover,
+.boton-aceptado-modal:hover {
+  background: linear-gradient(135deg, var(--color-primary-hover-dark) 0%, var(--color-primary) 100%);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+  transform: translateY(-2px);
 }
 
-:deep(.q-table__bottom) {
-  padding: 8px 0;
-  min-height: 40px;
+.boton-rechazar-modal {
+  background: linear-gradient(135deg, #DC3545 0%, #C82333 100%);
+  color: white;
+  border-radius: 8px;
+  padding: 10px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+  min-width: 140px;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  transition: all 0.3s ease;
 }
 
-:deep(.q-table__control) {
-  font-size: 11px;
+.boton-rechazar-modal:hover {
+  background: linear-gradient(135deg, #C82333 0%, #DC3545 100%);
+  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Estilos para BotonCerrar y BotonEnviar */
+:deep(.q-btn.boton-cerrar),
+:deep(.q-btn.boton-enviar) {
+  border-radius: 8px;
+  padding: 10px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+  min-width: 140px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+:deep(.q-btn.boton-cerrar:hover),
+:deep(.q-btn.boton-enviar:hover) {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 /* Responsive */
@@ -1352,29 +1242,46 @@ async function confirmarRechazo() {
   }
 
   /* Modales responsive */
-  .modal-body-custom {
-    padding: 20px 25px;
+  :deep(.q-dialog__inner > .q-card) {
+    max-width: 95%;
   }
-  
-  .modal-confirmacion-body {
-    padding: 20px 25px;
+
+  .modal-header-custom,
+  .modal-header-simple,
+  .modal-header-empresa {
+    padding: 18px 20px;
   }
-  
+
+  .modal-body-custom,
+  .modal-confirmacion-body,
   .modal-exito-body {
-    padding: 0 25px 15px;
+    padding: 20px 24px;
+  }
+  
+  :deep(.q-dialog .q-card__section:not(:first-child):not(:last-child)) {
+    padding: 20px 24px;
   }
   
   .aprendiz-details {
     grid-template-columns: 1fr;
   }
   
-  .modal-footer-custom-dual {
+  .modal-footer-custom-simple,
+  .modal-footer-custom-dual,
+  .modal-footer-custom-center {
     flex-direction: column;
     gap: 10px;
+    padding: 18px 20px;
   }
   
   .boton-aceptado-modal,
-  .boton-rechazar-modal {
+  .boton-rechazar-modal,
+  .boton-asignar-modal {
+    width: 100%;
+  }
+
+  :deep(.q-btn.boton-cerrar),
+  :deep(.q-btn.boton-enviar) {
     width: 100%;
   }
 }
@@ -1415,28 +1322,29 @@ async function confirmarRechazo() {
   }
 
   /* Modales responsive móvil */
-  .modal-body-custom {
-    padding: 15px 20px;
+  .modal-header-custom,
+  .modal-header-simple,
+  .modal-header-empresa {
+    padding: 16px 18px;
   }
-  
-  .modal-confirmacion-body {
-    padding: 15px 20px;
-  }
-  
-  .modal-exito-body {
-    padding: 0 20px 12px;
-  }
-  
-  .aprendiz-nombre-modal {
+
+  .modal-title,
+  .modal-title-center {
     font-size: 16px;
   }
-  
+
   .modal-title-empresa {
     font-size: 18px;
   }
+
+  .modal-body-custom,
+  .modal-confirmacion-body,
+  .modal-exito_body {
+    padding: 16px 20px;
+  }
   
-  .modal-title {
-    font-size: 16px;
+  :deep(.q_dialog .q_card__section:not(:first-child):not(:last-child)) {
+    padding: 16px 20px;
   }
 
   .form-label {
@@ -1447,34 +1355,12 @@ async function confirmarRechazo() {
     min-height: 44px;
   }
 
-  .instructor-asignado {
-    padding: 12px 15px;
-  }
-
-  .instructor-avatar {
-    width: 45px;
-    height: 45px;
-    font-size: 16px;
-  }
-
-  .instructor-nombre {
-    font-size: 14px;
-  }
-
-  .instructor-cargo {
-    font-size: 12px;
-  }
-
-  .modal-confirmacion-body {
-    padding: 12px 15px;
-  }
-
   .confirmacion-label {
     font-size: 13px;
   }
 
   .instructor-confirmacion {
-    padding: 10px;
+    padding: 12px;
     gap: 12px;
   }
 
@@ -1492,61 +1378,27 @@ async function confirmarRechazo() {
     font-size: 12px;
   }
 
-  .modal-exito-body {
-    padding: 12px 15px;
-  }
-
-  .banner-ficha-modal {
-    padding: 10px 14px;
-  }
-
-  .instructor-asignado-modal {
-    padding: 12px 14px;
-  }
-
-  .instructor-title-modal {
-    font-size: 13px;
-  }
-
-  .instructor-avatar-modal {
-    width: 40px;
-    height: 40px;
-    font-size: 14px;
-  }
-
-  .instructor-nombre-modal {
-    font-size: 13px;
-  }
-
-  .instructor-cargo-modal {
-    font-size: 11px;
-  }
-
-  .mensaje-contrato-modal {
-    padding: 8px 12px;
-  }
-
-  .mensaje-contrato-modal p {
-    font-size: 12px;
-  }
-
-  .simple-table-modal thead th {
-    font-size: 12px;
-    padding: 8px 10px;
-  }
-
-  .simple-table-modal tbody td {
-    font-size: 11px;
-    padding: 8px 10px;
-  }
-
-  .ver-documentos-link-modal {
-    font-size: 11px;
-  }
-
-  .modal-footer-custom,
+  .modal-footer-custom-simple,
+  .modal-footer-custom-dual,
   .modal-footer-custom-center {
-    padding: 12px 15px 15px;
+    padding: 16px 18px;
+  }
+
+  :deep(.q-dialog .q-card__section:last-child) {
+    padding: 16px 18px;
+  }
+
+  .boton-asignar-modal,
+  .boton-aceptado-modal,
+  .boton-rechazar-modal {
+    padding: 10px 24px;
+    font-size: 13px;
+  }
+
+  :deep(.q-btn.boton-cerrar),
+  :deep(.q-btn.boton-enviar) {
+    padding: 10px 24px;
+    font-size: 13px;
   }
 }
 
